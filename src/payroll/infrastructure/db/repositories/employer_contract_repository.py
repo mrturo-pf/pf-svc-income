@@ -302,6 +302,7 @@ class SqlAlchemyEmployerContractRepositoryMixin(SqlAlchemyPayrollRepositoryBase)
         """Reject any interval overlap, excluding the update target itself."""
         result = await self._session.execute(
             select(EmploymentContractModel).where(
+                EmploymentContractModel.employer_id == command.employer_id,
                 EmploymentContractModel.started_at <= (command.ended_at or date.max),
                 (
                     EmploymentContractModel.ended_at.is_(None)
