@@ -127,8 +127,8 @@ converter would otherwise swallow `GET /payroll/templates` as `period_id="templa
 
 Employer/contract maintenance is additive and uses IDs for all relationships. A
 contract's worked-month eligibility is distinct from its payroll payment date, so
-final settlements after an employer change remain representable. Global interval
-non-overlap is enforced by the coordinated `pf-db` schema constraint.
+final settlements after an employer change remain representable. Interval non-overlap is enforced per employer by the coordinated `pf-db` schema
+constraint; different employers may have contracts covering the same dates.
 
 
 | Method | Path | Description |

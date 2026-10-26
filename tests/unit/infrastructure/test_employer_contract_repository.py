@@ -111,6 +111,8 @@ async def test_maintain_contracts_creates_and_updates() -> None:
         [contract_command(), contract_command(4)]
     )
     assert len(result.contracts) == 2
+    overlap_statement = str(session.statements[1])
+    assert "employer_id" in overlap_statement
     with pytest.raises(errors.PayrollNotFoundError):
         await Repo(Session([Result(scalar_one=None)])).maintain_contracts(
             [contract_command(99)]
