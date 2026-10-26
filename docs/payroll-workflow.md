@@ -220,6 +220,7 @@ Import notes:
 - `net_pay` is optional; if present, the imported period is marked as `actual`, otherwise it is marked as `projected`
 - `net_pay` is **not** imported as a payroll concept row
 - when `net_pay` is present, the import response stores the declared value and marks reconciliation as pending until computed contributions and income tax are generated
+- a historical XLSX export is not guaranteed to re-import cleanly: persisted contribution and complementary-insurance amounts may reflect rules or reference data that differ from the current calculation state; use a current minimal fixture for automated `mode=validate` tests and treat a historical export/import `422` as a reconciliation gap, not a reason to weaken validation
 - when the imported period already has pension and health plan snapshots assigned, post-processing also validates `PENSION_BASE`, `PENSION_ADDITIONAL`, `HEALTH_BASE`, and `HEALTH_ADDITIONAL_UF` against the internally computed contribution values
 - if plan snapshots are still missing, that contribution validation stays pending until the import post-processing services assign plans and compute contributions
 - during import, the system also tries to fetch any missing `UF`, `UTM`, `USD`, `EUR`, or `IPC_CL` entries required by the imported period so the next calculation steps can run immediately
