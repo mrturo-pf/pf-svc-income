@@ -694,7 +694,7 @@ class SqlAlchemyPayrollRepositoryBase:
         """Handle refresh summary view."""
         await self._session.commit()
         await self._session.execute(
-            text('REFRESH MATERIALIZED VIEW "INC_MV_PAY_SUMMARY"')
+            text('SELECT public."INC_FN_REFRESH_PAY_SUMMARY"()')
         )
         await self._session.commit()
 
