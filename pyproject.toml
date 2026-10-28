@@ -45,6 +45,7 @@ dev = [
 testpaths = ["tests"]
 pythonpath = ["tests"]
 asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
   "error",
   # starlette.testclient imports anyio.abc.BlockingPortal, which anyio itself
