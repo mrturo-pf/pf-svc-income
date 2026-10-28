@@ -44,15 +44,17 @@ def _request(path: str = "/payroll") -> Request:
 
 
 @pytest.mark.asyncio
-async def test_unexpected_error_handler_returns_diagnostic_detail() -> None:
-    """Unexpected failures include type, message, and request path."""
+async def test_unexpected_error_handler_hides_internal_details() -> None:
+    """Unexpected failures expose only a generic detail and request path."""
     response = await main.unexpected_error_handler(
         _request(), RuntimeError("database connection failed")
     )
 
     assert response.status_code == 500
     assert response.body is not None
-    assert b"RuntimeError: database connection failed" in response.body
+    assert b"Unexpected server error." in response.body
+    assert b"database connection failed" not in response.body
+    assert b"RuntimeError" not in response.body
     assert b'"path":"/payroll"' in response.body
 
 

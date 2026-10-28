@@ -66,23 +66,17 @@ async def request_validation_error_handler(
 
 @app.exception_handler(Exception)
 async def unexpected_error_handler(request: Request, exc: Exception) -> JSONResponse:
-    """Log unexpected failures and expose their actionable error detail.
-
-    The exception type and message are returned for diagnosis while the full
-    traceback stays in structured application logs.
-    """
-    logger.exception(
+    """Log safe failure metadata without exposing internals or request headers."""
+    logger.error(
         "unexpected_request_error",
         method=request.method,
         path=request.url.path,
         error_type=type(exc).__name__,
-        error=str(exc),
     )
-    message = str(exc).strip() or "No additional error detail was provided."
     return JSONResponse(
         status_code=500,
         content={
-            "detail": (f"Unexpected server error. {type(exc).__name__}: {message}"),
+            "detail": "Unexpected server error.",
             "path": request.url.path,
         },
     )
