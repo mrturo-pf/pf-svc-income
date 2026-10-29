@@ -229,10 +229,29 @@ async def test_delete_employers_succeeds_without_dependents() -> None:
             Result(scalar_rows=[employer_model()]),
             Result(scalar_rows=[]),
             Result(scalar_rows=[]),
+            Result(scalar_rows=[]),
+            Result(scalar_rows=[]),
         ]
     )
     await Repo(session).delete_employers([1])
-    assert len(session.statements) == 4
+    assert len(session.statements) == 6
+
+
+@pytest.mark.asyncio
+async def test_delete_employers_rejects_active_templates() -> None:
+    """Keep active templates as an explicit employer deletion blocker."""
+    session = Session(
+        [
+            Result(scalar_rows=[employer_model()]),
+            Result(scalar_rows=[]),
+            Result(scalar_rows=[]),
+            Result(scalar_rows=[25]),
+        ]
+    )
+    with pytest.raises(errors.PayrollConflictError) as error:
+        await Repo(session).delete_employers([1])
+    conflicts = error.value.detail["employer_deletion_conflicts"]
+    assert conflicts[0]["active_template_ids"] == [25]
 
 
 @pytest.mark.asyncio
