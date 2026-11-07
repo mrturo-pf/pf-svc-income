@@ -296,8 +296,8 @@ make migrate  # applies all pending migrations
 In production, pf-svc-income connects to the same shared database instance as pf-rates.
 
 **Database options:**
-- **External** (Neon, Supabase): Set `PF_DATABASE_URL` secret in Secret Manager
-- **Cloud SQL**: Set `PF_DATABASE_URL` + `GCP_CLOUD_SQL_INSTANCE` secret
+- **External** (Neon, Supabase): Set `PF_SVC_INCOME_DATABASE_URL` secret in Secret Manager; it is injected as `PF_DATABASE_URL`
+- **Cloud SQL**: Set `PF_SVC_INCOME_DATABASE_URL` + `GCP_CLOUD_SQL_INSTANCE` secret; it is injected as `PF_DATABASE_URL`
 
 **Migrations:** The `pf-db` Cloud Run Job applies `alembic upgrade head` before any service receives traffic. See [Deployment Guide](deployment.md#pipeline-invariants) for details.
 

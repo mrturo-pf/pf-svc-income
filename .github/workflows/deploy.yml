@@ -20,11 +20,11 @@
 #     --location=us-central1 \
 #     --description="pf-svc-income container images"
 #
-#   # 3. Create the PF_DATABASE_URL secret in Secret Manager
+#   # 3. Create the PF_SVC_INCOME_DATABASE_URL secret in Secret Manager
 #   #    Cloud SQL Unix socket format:
 #   #      postgresql+asyncpg://<USER>:<PASSWORD>@/pf_db?host=/cloudsql/PROJECT:REGION:pf-db
 #   echo -n "postgresql+asyncpg://<USER>:<PASSWORD>@/pf_db?host=/cloudsql/<PROJECT>:us-central1:pf-db" | \
-#     gcloud secrets create PF_DATABASE_URL --data-file=-
+#     gcloud secrets create PF_SVC_INCOME_DATABASE_URL --data-file=-
 #
 #   # 4. Create service account and grant IAM roles
 #   gcloud iam service-accounts create pf-svc-income \
@@ -47,8 +47,8 @@
 #   # Upload sa-key.json contents to GitHub secret GCP_SA_KEY, then delete the file.
 #   rm sa-key.json
 #
-#   # 6. Grant SA access to the PF_DATABASE_URL secret
-#   gcloud secrets add-iam-policy-binding PF_DATABASE_URL \
+#   # 6. Grant SA access to the PF_SVC_INCOME_DATABASE_URL secret
+#   gcloud secrets add-iam-policy-binding PF_SVC_INCOME_DATABASE_URL \
 #     --member="serviceAccount:${SA}" \
 #     --role="roles/secretmanager.secretAccessor"
 #
@@ -97,7 +97,7 @@
 # see the "Deploy to Cloud Run" step in deploy-reusable.yml.
 #
 # Secret Manager Secrets (auto-injected by reusable workflow):
-#   PF_DATABASE_URL                 — Database connection string
+#   PF_SVC_INCOME_DATABASE_URL      — Database connection string
 #   PF_RATES_API_KEY                — API key for calling pf-rates service
 #   PF_INCOME_API_KEY              — API key for this service
 #
@@ -126,9 +126,9 @@ jobs:
     uses: mrturo-pf/pf-common/.github/workflows/deploy-reusable.yml@main
     with:
       repo_name: pf-svc-income
-      # Injects the PF_DATABASE_URL secret into the app as PF_DATABASE_URL.
+      # Injects PF_SVC_INCOME_DATABASE_URL into the app as PF_DATABASE_URL.
       # Uses the platform-aware jscpd package resolver from pf-common.
-      database_secret_name: PF_DATABASE_URL
+      database_secret_name: PF_SVC_INCOME_DATABASE_URL
       workload_identity_provider: projects/646185261155/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc
       deployer_service_account: pf-svc-income-deployer@coreassistant-474022.iam.gserviceaccount.com
       dependency_service_name: pf-rates

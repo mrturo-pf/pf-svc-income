@@ -70,7 +70,7 @@ Push to main after merge
 3. **DB URL via `--set-secrets` only** — never `--set-env-vars`
    ```bash
    #  Correct
-   --set-secrets=PF_DATABASE_URL=PF_DATABASE_URL:latest
+   --set-secrets=PF_DATABASE_URL=PF_SVC_INCOME_DATABASE_URL:latest
    
    #  Wrong (exposes secret in gcloud describe)
    --set-env-vars=PF_DATABASE_URL=postgresql://...
@@ -120,7 +120,7 @@ Configure the following secrets in the repository (Settings → Secrets and vari
 |---|:---:|---|
 | `GCP_SA_KEY` |  | Service-account JSON key with roles: `roles/run.admin`, `roles/iam.serviceAccountUser`, `roles/artifactregistry.writer` |
 | `GCP_PROJECT_ID` |  | GCP project ID (e.g., `my-project-123`) |
-| `PF_DATABASE_URL` |  | Database connection string stored in Secret Manager and injected into Cloud Run at runtime |
+| `PF_SVC_INCOME_DATABASE_URL` |  | Database connection string secret; injected into Cloud Run as runtime env `PF_DATABASE_URL` |
 | `GCP_CLOUD_SQL_INSTANCE` | optional | Cloud SQL instance in `PROJECT:REGION:INSTANCE` format (leave empty for external DB) |
 | `MAIL_SERVER` |  | SMTP server hostname (e.g., `smtp.gmail.com`) |
 | `MAIL_PORT` |  | SMTP port (e.g., `587` for STARTTLS) |
@@ -133,18 +133,18 @@ Configure the following secrets in the repository (Settings → Secrets and vari
 > configure -- the deploy pipeline resolves pf-rates' live Cloud Run URL at
 > deploy time (`gcloud run services describe pf-rates`) and injects it as a
 > plain env var. `PF_RATES_API_KEY` (the credential half) still comes from
-> Secret Manager, same as `PF_DATABASE_URL`.
+> Secret Manager, same as `PF_SVC_INCOME_DATABASE_URL`.
 
 ### Database options
 
 The pipeline supports two database configurations:
 
 **Option A — External DB** (Neon, Supabase, etc.):
-- Set `PF_DATABASE_URL` in Secret Manager pointing to the external host
+- Set `PF_SVC_INCOME_DATABASE_URL` in Secret Manager pointing to the external host
 - Leave `GCP_CLOUD_SQL_INSTANCE` **empty**
 
 **Option B — Cloud SQL**:
-- Set `PF_DATABASE_URL` in Secret Manager with `localhost` (proxy sidecar handles connection)
+- Set `PF_SVC_INCOME_DATABASE_URL` in Secret Manager with `localhost` (proxy sidecar handles connection)
 - Set `GCP_CLOUD_SQL_INSTANCE=PROJECT:us-central1:pf-db`
 - Pipeline adds Cloud SQL proxy sidecar automatically
 
@@ -161,7 +161,7 @@ The pipeline supports two database configurations:
 | **CPU** | `1` | Single vCPU |
 | **Port** | `8000` | FastAPI default (Cloud Run injects `PORT` env var) |
 | **Service account** | `pf-svc-income@<PROJECT>.iam.gserviceaccount.com` | Needs `roles/secretmanager.secretAccessor` |
-| **Secrets** | `PF_DATABASE_URL` from Secret Manager | Never use `--set-env-vars` |
+| **Secrets** | `PF_SVC_INCOME_DATABASE_URL` injected as runtime env `PF_DATABASE_URL` | Never use `--set-env-vars` |
 
 The application database engine uses the approved `pf-db` connection contract:
 `pool_size=5`, `max_overflow=0`, `pool_pre_ping=True`, and
@@ -207,7 +207,7 @@ gcloud run deploy pf-svc-income \
   --image=us-central1-docker.pkg.dev/PROJECT_ID/pf-svc-income/app:manual \
   --region=us-central1 \
   --platform=managed \
-  --set-secrets=PF_DATABASE_URL=PF_DATABASE_URL:latest \
+  --set-secrets=PF_DATABASE_URL=PF_SVC_INCOME_DATABASE_URL:latest \
   --min-instances=0 \
   --max-instances=2 \
   --memory=512Mi \
