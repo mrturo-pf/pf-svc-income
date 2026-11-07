@@ -120,7 +120,7 @@ converter would otherwise swallow `GET /payroll/templates` as `period_id="templa
 | --- | --- | --- |
 | `GET` | `/payroll/employers` | Lists employers with `{ id, name, tax_id, country_code, increase: { frequency, first_increase_period: { year, month } | null }, payment_date: { rule, month_offset, day_of_month, business_day_offset, calendar_day_offset, effective_on_processing_next_day, fixed_day_roll }, contracts }`. Nested contracts contain id, started_at, ended_at, is_indefinite, position, and is_in_effect; the employer is not repeated. |
 | `POST` | `/payroll/employers` | Atomic batch create/update. Omitted/null `id` creates; an existing positive `id` updates; an unknown `id` is an error and never becomes a create. |
-| `DELETE` | `/payroll/employers` | Atomic batch deletion by `{ "ids": [ ... ] }`. Returns `409` when contracts or payroll periods block deletion. |
+| `DELETE` | `/payroll/employers` | Atomic batch deletion by `{ "ids": [ ... ] }`. Returns `409` when contracts, payroll periods, or active PDF templates block deletion. Inactive PDF templates are purged as part of deleting their employer so soft-deleted template rows cannot leave an FK orphan blocker. |
 | `GET` | `/payroll/contracts` | Lists contracts as `{ id, employer: { id, name }, started_at, ended_at, is_indefinite, position, is_in_effect }`, optionally filtered by `employer_id`. `is_in_effect` is true when today's date is within the contract interval. |
 | `POST` | `/payroll/contracts` | Atomic batch create/update using ID presence. Contracts require a real `employer_id`, `started_at`, and non-overlapping validity intervals. |
 | `DELETE` | `/payroll/contracts` | Atomic batch deletion by `{ "ids": [ ... ] }`. Returns `409` when worked-month payroll periods block deletion. |

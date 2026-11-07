@@ -3,7 +3,7 @@
 import calendar
 from datetime import date
 
-from sqlalchemy import delete, select, true
+from sqlalchemy import delete, false, select, true
 
 from payroll.application.dto import (
     ContractMaintenanceResultDTO,
@@ -24,6 +24,7 @@ from payroll.application.errors import (
     PayrollValidationError,
 )
 from payroll.infrastructure.db.models import EmployerModel
+from payroll.infrastructure.db.models.pdf_template import PdfTemplateModel
 from payroll.infrastructure.db.models.payroll import (
     EmploymentContractModel,
     EmployerFixedDayRoll,
@@ -230,6 +231,20 @@ class SqlAlchemyEmployerContractRepositoryMixin(SqlAlchemyPayrollRepositoryBase)
                         "period_ids": period_ids,
                     }
                 )
+        active_templates = await self._session.execute(
+            select(PdfTemplateModel.id).where(
+                PdfTemplateModel.employer_id.in_(employer_ids),
+                PdfTemplateModel.is_active.is_(true()),
+            )
+        )
+        active_template_ids = list(active_templates.scalars().all())
+        if active_template_ids:
+            blockers.append(
+                {
+                    "employer_ids": employer_ids,
+                    "active_template_ids": active_template_ids,
+                }
+            )
         if blockers:
             raise PayrollConflictError(
                 "One or more employers have dependent data.",
@@ -238,6 +253,16 @@ class SqlAlchemyEmployerContractRepositoryMixin(SqlAlchemyPayrollRepositoryBase)
                     "employer_deletion_conflicts": blockers,
                 },
             )
+        # Template DELETE is intentionally a soft-delete for normal template
+        # lifecycle operations. Once the owning employer itself is deleted,
+        # inactive templates are orphaned history and must be physically
+        # removed so their employer FK cannot make this operation fail.
+        await self._session.execute(
+            delete(PdfTemplateModel).where(
+                PdfTemplateModel.employer_id.in_(employer_ids),
+                PdfTemplateModel.is_active.is_(false()),
+            )
+        )
         await self._session.execute(
             delete(EmployerModel).where(EmployerModel.id.in_(employer_ids))
         )
