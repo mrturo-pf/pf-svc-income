@@ -33,6 +33,7 @@ WORKDIR /app
 # published against the image's OS packages since it was last rebuilt, even
 # when our own dependencies haven't changed at all.
 RUN apt-get update \
+    && apt-get install --only-upgrade --no-install-recommends -y zlib1g \
     && apt-get upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -48,7 +49,7 @@ COPY --from=builder /opt/venv /opt/venv
 # Keep the filesystem sweep broad because package locations vary between
 # Python slim image revisions.
 RUN /usr/local/bin/pip uninstall -y setuptools msgpack 2>/dev/null || true; \
-    find /usr -xdev -depth \
+    find /opt /usr -xdev -depth \
       \( -iname 'pip*' -o -iname 'setuptools*' -o -iname 'msgpack*' \
          -o -iname '_distutils_hack' -o -iname 'pkg_resources' \) \
       -print -exec rm -rf {} +; \
