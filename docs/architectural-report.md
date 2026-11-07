@@ -9,7 +9,7 @@
 * **Financial precision:** exact calculation. Strict use of `Decimal` in Python and `NUMERIC` in PostgreSQL. Never use floating-point types.
 * **Macroeconomic variables:** currencies (CLP, USD, EUR), inflation-adjustment units (UF, UTM), and deflators (CPI). Native support for historical queries and deflation ($Amount_{Real} = Amount_{Nominal} \times CPI_{Target} \div CPI_{Origin}$).
 * **Social security modules (Chile):** historical, institution-independent modeling (AFP, Isapre, Fonasa), contracted plans, and variable taxable-income caps. Tax calculations (single income tax) depend on the SII's official table.
-* **Immutability:** records in the `PAY_PERIOD` table act as *snapshots*. If an AFP or Isapre plan changes in the future, historical periods keep the IDs of whichever plans were active on the original payment date.
+* **Immutability:** records in the `INC_PAYROLL` table act as *snapshots*. If an AFP or Isapre plan changes in the future, historical periods keep the IDs of whichever plans were active on the original payment date.
 * **Persistence and portability:** PostgreSQL 16 as the primary engine. The schema is environment-agnostic, using idempotent DDL with no dependency on extensions that require superuser privileges (for frictionless deployment on Neon, Supabase, RDS, etc.).
 
 ---
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS "RAT_ECON_INDEX" (
 -- ============================================================
 -- 2. Social Security / Health Institutions and Plans
 -- ============================================================
-CREATE TABLE IF NOT EXISTS "PAY_PENS_INST" (
+CREATE TABLE IF NOT EXISTS "INC_PENS_INST" (
     id             BIGSERIAL PRIMARY KEY,
     code           VARCHAR(40)     NOT NULL UNIQUE,
     name           VARCHAR(120)    NOT NULL,
@@ -104,7 +104,7 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
-CREATE TABLE IF NOT EXISTS "PAY_HLTH_INST" (
+CREATE TABLE IF NOT EXISTS "INC_HLTH_INST" (
     id             BIGSERIAL PRIMARY KEY,
     code           VARCHAR(40)     NOT NULL UNIQUE,
     name           VARCHAR(120)    NOT NULL,
@@ -113,18 +113,18 @@ CREATE TABLE IF NOT EXISTS "PAY_HLTH_INST" (
     is_active      BOOLEAN         NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE IF NOT EXISTS "PAY_PENS_PLAN" (
+CREATE TABLE IF NOT EXISTS "INC_PENS_PLAN" (
     id              BIGSERIAL PRIMARY KEY,
-    institution_id  BIGINT          NOT NULL REFERENCES "PAY_PENS_INST"(id),
+    institution_id  BIGINT          NOT NULL REFERENCES "INC_PENS_INST"(id),
     valid_from      DATE            NOT NULL,
     valid_to        DATE,
     additional_rate NUMERIC(6,4)    NOT NULL DEFAULT 0 CHECK (additional_rate >= 0),
     CONSTRAINT chk_pension_plan_dates CHECK (valid_to IS NULL OR valid_to >= valid_from)
 );
 
-CREATE TABLE IF NOT EXISTS "PAY_HLTH_PLAN" (
+CREATE TABLE IF NOT EXISTS "INC_HLTH_PLAN" (
     id              BIGSERIAL PRIMARY KEY,
-    institution_id  BIGINT          NOT NULL REFERENCES "PAY_HLTH_INST"(id),
+    institution_id  BIGINT          NOT NULL REFERENCES "INC_HLTH_INST"(id),
     valid_from      DATE            NOT NULL,
     valid_to        DATE,
     plan_name       VARCHAR(120),
@@ -138,7 +138,7 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
-CREATE TABLE IF NOT EXISTS "PAY_CNTRB_CAP" (
+CREATE TABLE IF NOT EXISTS "INC_CNTRB_CAP" (
     id         BIGSERIAL PRIMARY KEY,
     cap_type   contribution_cap_type NOT NULL,
     valid_from DATE            NOT NULL,
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS "PAY_CNTRB_CAP" (
 -- ============================================================
 -- 3. Payroll Core
 -- ============================================================
-CREATE TABLE IF NOT EXISTS "PAY_EMPLOYER" (
+CREATE TABLE IF NOT EXISTS "INC_EMPLOYER" (
     id           BIGSERIAL PRIMARY KEY,
     name         VARCHAR(120)  NOT NULL UNIQUE,
     tax_id       VARCHAR(32),
@@ -164,21 +164,21 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
-CREATE TABLE IF NOT EXISTS "PAY_PERIOD" (
+CREATE TABLE IF NOT EXISTS "INC_PAYROLL" (
     id              BIGSERIAL PRIMARY KEY,
-    employer_id     BIGINT          NOT NULL REFERENCES "PAY_EMPLOYER"(id),
+    employer_id     BIGINT          NOT NULL REFERENCES "INC_EMPLOYER"(id),
     period_year     SMALLINT        NOT NULL,
     period_month    SMALLINT        NOT NULL,
     payment_date    DATE            NOT NULL,
     worked_days     SMALLINT        NOT NULL DEFAULT 30,
     status          payroll_status  NOT NULL DEFAULT 'projected',
-    pension_plan_id BIGINT          REFERENCES "PAY_PENS_PLAN"(id),
-    health_plan_id  BIGINT          REFERENCES "PAY_HLTH_PLAN"(id),
+    pension_plan_id BIGINT          REFERENCES "INC_PENS_PLAN"(id),
+    health_plan_id  BIGINT          REFERENCES "INC_HLTH_PLAN"(id),
     UNIQUE (employer_id, period_year, period_month)
 );
 
 -- 4. Analytics materialized view (see full definition in db/01_schema.sql)
-CREATE MATERIALIZED VIEW IF NOT EXISTS "PAY_MV_SUMARY" AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS "INC_MV_PAY_SUMMARY" AS
 SELECT
     p.id AS period_id,
     p.employer_id,
@@ -192,9 +192,9 @@ SELECT
     -- net_pay = gross - discounts (computed in the view)
     SUM(CASE WHEN c.kind = 'income'   THEN i.amount_clp ELSE 0 END)
   - SUM(CASE WHEN c.kind = 'discount' THEN i.amount_clp ELSE 0 END) AS net_pay_clp
-FROM "PAY_PERIOD" p
-JOIN "PAY_ITEM"   i ON i.period_id = p.id
-JOIN "PAY_CONCEPT" c ON c.id = i.concept_id
+FROM "INC_PAYROLL" p
+JOIN "INC_ITEM"   i ON i.period_id = p.id
+JOIN "INC_CONCEPT" c ON c.id = i.concept_id
 GROUP BY p.id;
 ```
 
@@ -325,7 +325,7 @@ def to_long_format(wide_df: pd.DataFrame) -> pd.DataFrame:
 ### 5.1 Alternative ingestion: payslip PDF
 
 An alternative to Excel/CSV: extraction based on versioned templates stored in pf-db's
-`PAY_PDF_TEMPLATE`/`PAY_PDF_TEMPLATE_FIELD` tables (managed via `POST`/`GET`/`PUT`/
+`INC_PDF_TEMPLATE`/`INC_PDF_TEMPLATE_FIELD` tables (managed via `POST`/`GET`/`PUT`/
 `DELETE /payroll/templates*`, not a git-tracked file), never OCR/LLM. `POST
 /payroll/pdf-preview` accepts a batch of one or more payslip PDFs and returns one
 preview per file, in upload order; `POST /payroll/import/json` then confirms one or
@@ -443,7 +443,7 @@ pg_restore \
 
 # 5. Validation and analytics rebuild
 psql "$TARGET_DSN" -c "REINDEX DATABASE payroll; ANALYZE;"
-psql "$TARGET_DSN" -c "REFRESH MATERIALIZED VIEW CONCURRENTLY "PAY_MV_SUMARY";"
+psql "$TARGET_DSN" -c "REFRESH MATERIALIZED VIEW CONCURRENTLY "INC_MV_PAY_SUMMARY";"
 ```
 
 ---

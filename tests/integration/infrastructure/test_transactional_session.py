@@ -1,6 +1,6 @@
 """End-to-end proof that TransactionalSessionScope really discards writes.
 
-This is the one spot in pf-payroll's test suite that talks to a real
+This is the one spot in pf-svc-income's test suite that talks to a real
 Postgres (via testcontainers) instead of a fake session -- deliberately.
 Everything else about the payroll domain is already covered by fast fakes
 (see tests/unit/infrastructure/test_payroll_repository.py), but the whole

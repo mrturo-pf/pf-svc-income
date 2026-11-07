@@ -36,7 +36,7 @@ _SPANISH_MONTHS = {
 }
 _MONTH_YEAR_RE = re.compile(r"(?i)\b(" + "|".join(_SPANISH_MONTHS) + r")\s+(\d{4})\b")
 _ANTIQUITY_AND_WORKED_DAYS_RE = re.compile(r"\d{2}\.\d{2}\.\d{4}\s+(\d{1,2})\b")
-_NET_PAY_RE = re.compile(r"(?i)L[IÍ]QUIDO\s+A\s+PAGAR\s+([\d][\d.,]*\d)")
+_NET_INC_RE = re.compile(r"(?i)L[IÍ]QUIDO\s+A\s+PAGAR\s+([\d][\d.,]*\d)")
 _AMOUNT_AT_END_RE = re.compile(r"(\d{1,3}(?:[.,]\d{3})+)\s*$")
 _TRAILING_TOKEN_RE = re.compile(r"\s+([0-9A-Z/]{3,6})\s*$")
 _DETAIL_SECTION_START_RE = re.compile(r"(?i)DETALLE")
@@ -131,7 +131,7 @@ def _parse_worked_days_from_dias_trabajados_column(text: str) -> int | None:
 
 def parse_declared_net_pay(text: str) -> Decimal | None:
     """Parse the declared net pay ("liquido a pagar") amount."""
-    match = _NET_PAY_RE.search(text)
+    match = _NET_INC_RE.search(text)
     if match is None:
         return None
     return parse_amount(match.group(1))

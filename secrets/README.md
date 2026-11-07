@@ -1,13 +1,13 @@
-# secrets/ (pf-payroll, local-only)
+# secrets/ (pf-svc-income, local-only)
 
 Module-scoped, machine-local secrets **and PII staging area** for
-`pf-payroll`. Everything placed in this folder — including new subfolders —
+`pf-svc-income`. Everything placed in this folder — including new subfolders —
 is gitignored by default (see `.gitignore` right here): only this
 `README.md` and the `.gitignore` itself can ever be committed.
 
 ## Why this exists (PII, not just credentials)
 
-`pf-payroll` deals with real Chilean *liquidaciones de sueldo* (national ID/RUT,
+`pf-svc-income` deals with real Chilean *liquidaciones de sueldo* (national ID/RUT,
 salary, pension, health data). Per this repo's non-negotiable PII rule, no real PDF and
 no JSON/fixture derived from a real PDF may ever live in a git-tracked
 folder — not even temporarily, not even in a test fixtures directory. This

@@ -1,4 +1,4 @@
-"""Port definitions for PDF template storage (pf-db PAY_PDF_TEMPLATE*)."""
+"""Port definitions for PDF template storage (pf-db INC_PDF_TEMPLATE*)."""
 
 from typing import Protocol
 
@@ -66,9 +66,9 @@ class TemplateRepository(Protocol):
         ...
 
     async def resolve_concepts(self, codes: set[str]) -> dict[str, ConceptRef]:
-        """Resolve each code's real PAY_CONCEPT id + kind, keyed by concept_code.
+        """Resolve each code's real INC_CONCEPT id + kind, keyed by concept_code.
 
-        A code with no matching PAY_CONCEPT row is simply absent from the
+        A code with no matching INC_CONCEPT row is simply absent from the
         result (never raises) -- callers (the /payroll/templates routes, and
         this repository's own write path) use a missing key to reject an
         unknown concept_code with a clear 400 before ever attempting to

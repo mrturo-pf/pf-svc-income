@@ -70,7 +70,7 @@ class PdfTemplateFieldModel(Base):
     # always resolves kind from INC_PAY_CONCEPT via concept_id at read time. See
     # pf-db migration 0010.
     # concept_id, not concept_code: every other table referencing INC_PAY_CONCEPT
-    # does so by its surrogate id (PAY_ITEM.concept_id) -- a VARCHAR FK to
+    # does so by its surrogate id (INC_ITEM.concept_id) -- a VARCHAR FK to
     # INC_PAY_CONCEPT(code) was an unintentional inconsistency, fixed in pf-db
     # migration 0011. concept_code remains the business-facing identifier at
     # every application layer above this model (DTOs, requests/responses,

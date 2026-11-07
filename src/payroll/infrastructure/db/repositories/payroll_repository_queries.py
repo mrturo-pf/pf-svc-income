@@ -51,7 +51,7 @@ from payroll.shared.dates import add_months, resolve_payment_date
 
 
 class _SummaryAmounts(NamedTuple):
-    """PAY_MV_SUMARY's three derived CLP totals for a single period."""
+    """INC_MV_PAY_SUMMARY's three derived CLP totals for a single period."""
 
     gross_income_clp: Decimal
     taxable_income_clp: Decimal
@@ -242,7 +242,7 @@ class SqlAlchemyPayrollQueryRepository(SqlAlchemyPayrollRepositoryBase):
     async def _fetch_summary_amounts_map(
         self, period_ids: list[int]
     ) -> dict[int, _SummaryAmounts]:
-        """Batch-fetch PAY_MV_SUMARY gross/taxable/discount totals by period_id.
+        """Batch-fetch INC_MV_PAY_SUMMARY gross/taxable/discount totals by period_id.
 
         One round trip regardless of how many period_ids are requested --
         same "batch it, never N+1" discipline as the SALARY_BASE/
@@ -461,7 +461,7 @@ class SqlAlchemyPayrollQueryRepository(SqlAlchemyPayrollRepositoryBase):
                 for row in all_aggregate_rows
             }
 
-        # Fetch PAY_MV_SUMARY's gross/taxable/discount totals for the same
+        # Fetch INC_MV_PAY_SUMMARY's gross/taxable/discount totals for the same
         # real periods -- unavailable (missing from the map) for any period
         # the materialized view hasn't computed yet, which simply means
         # None on the resulting DTO, same degrade-honestly philosophy as

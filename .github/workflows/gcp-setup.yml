@@ -1,5 +1,5 @@
 # ==============================================================================
-# GCP Setup - pf-payroll
+# GCP Setup - pf-svc-income
 # ==============================================================================
 #
 # One-time setup workflow to create required GCP resources:
@@ -16,7 +16,7 @@
 #
 # ==============================================================================
 
-name: GCP Setup - pf-payroll
+name: GCP Setup - pf-svc-income
 
 on:
   workflow_dispatch:

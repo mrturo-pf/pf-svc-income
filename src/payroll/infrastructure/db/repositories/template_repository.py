@@ -1,4 +1,4 @@
-"""SQLAlchemy repository for PDF payslip templates (PAY_PDF_TEMPLATE*).
+"""SQLAlchemy repository for PDF payslip templates (INC_PDF_TEMPLATE*).
 
 Implements both `TemplateReader` (read-only, used by `PreviewPdfImport`) and
 `TemplateRepository` (full CRUD, used by the `/payroll/templates` routes) --
@@ -9,12 +9,12 @@ one concrete class satisfying two Protocols, mirroring how
 None of `PdfTemplateFieldModel.kind`, `PdfTemplateModel.employer_name`, nor
 `PdfTemplateFieldModel.concept_code` exist anymore (see pf-db migrations
 0010/0011/0012) -- all three used to duplicate data already owned by
-`PAY_CONCEPT`/`PAY_EMPLOYER` (the first two with no referential integrity
+`INC_CONCEPT`/`INC_EMPLOYER` (the first two with no referential integrity
 tying the copies together; the third as a plain inconsistency with every
-other FK into `PAY_CONCEPT` in the schema, which all reference its surrogate
+other FK into `INC_CONCEPT` in the schema, which all reference its surrogate
 `id`). `PdfTemplateModel.employer_id` is now required (migration 0012) -- a
 template may only be created for an employer that already has a
-`PAY_EMPLOYER` row. This repository is the one place that resolves the
+`INC_EMPLOYER` row. This repository is the one place that resolves the
 display name and field kinds, fresh, on every read and write.
 """
 
@@ -55,10 +55,10 @@ def _to_dto(
     `_dto_lookup_dicts()`) -- this function does no I/O of its own, so it
     stays trivially testable without a session. `concepts_by_id` maps
     `concept_id -> (code, kind)`: one lookup resolves both values a field
-    needs, since both live on the same `PAY_CONCEPT` row. `employer_id` is
+    needs, since both live on the same `INC_CONCEPT` row. `employer_id` is
     required (NOT NULL, see pf-db migration 0012), so `employer_names` is
     expected to always have an entry for it -- a loaded model's employer_id
-    is guaranteed to reference a real PAY_EMPLOYER row by the FK itself.
+    is guaranteed to reference a real INC_EMPLOYER row by the FK itself.
     """
     return PdfTemplateDTO(
         id=model.id,
@@ -179,7 +179,7 @@ class SqlAlchemyTemplateRepository:
         return await self.get_template(template_id, include_inactive=True)
 
     async def resolve_concepts(self, codes: set[str]) -> dict[str, ConceptRef]:
-        """Resolve each code's real PAY_CONCEPT id + kind, keyed by concept_code."""
+        """Resolve each code's real INC_CONCEPT id + kind, keyed by concept_code."""
         if not codes:
             return {}
         statement = select(
@@ -223,7 +223,7 @@ class SqlAlchemyTemplateRepository:
         ]
 
     async def _load_employer_names(self, employer_ids: set[int]) -> dict[int, str]:
-        """Resolve PAY_EMPLOYER.name for a set of ids -- the read path's names."""
+        """Resolve INC_EMPLOYER.name for a set of ids -- the read path's names."""
         if not employer_ids:
             return {}
         statement = select(EmployerModel.id, EmployerModel.name).where(
@@ -238,7 +238,7 @@ class SqlAlchemyTemplateRepository:
         Mirrors _to_field_models()'s unknown-concept_code check: rejecting
         explicitly here is earlier and clearer than leaning solely on the FK
         IntegrityError translated by _commit_or_raise(). A template may only
-        be created for an employer that already has a PAY_EMPLOYER row (see
+        be created for an employer that already has a INC_EMPLOYER row (see
         pf-db migration 0012) -- there is no standalone endpoint to create
         one ahead of that.
         """
@@ -248,7 +248,7 @@ class SqlAlchemyTemplateRepository:
     async def _load_concepts_by_id(
         self, concept_ids: set[int]
     ) -> dict[int, tuple[str, str]]:
-        """Resolve (code, kind) for a set of PAY_CONCEPT ids, for the read path.
+        """Resolve (code, kind) for a set of INC_CONCEPT ids, for the read path.
 
         The mirror image of resolve_concepts() (which looks up by code, for
         the write path) -- purely internal to this repository's own

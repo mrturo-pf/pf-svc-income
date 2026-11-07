@@ -22,7 +22,7 @@ curl -X POST http://127.0.0.1:8000/payroll/import/spreadsheet \
 
 Instead of a CSV/XLSX file, one or more payslip PDFs can be turned into payroll
 periods through a two-step preview/confirm flow. Extraction is template-based
-(versioned templates stored in pf-db's `PAY_PDF_TEMPLATE`/`PAY_PDF_TEMPLATE_FIELD`
+(versioned templates stored in pf-db's `INC_PDF_TEMPLATE`/`INC_PDF_TEMPLATE_FIELD`
 tables, managed via `POST`/`GET`/`PUT`/`DELETE /payroll/templates*`), never OCR/LLM --
 a PDF matching no known template, or containing rows a template doesn't recognize,
 still contributes a usable preview with those rows flagged as unresolved
@@ -66,7 +66,7 @@ the preview includes that this endpoint doesn't need (`template_id`, and each ro
 at least one element, and no two elements may share the same `(employer, period_year,
 period_month)` -- merge their `rows` by hand first if that's genuinely the same period.
 Double-check that the employer already has an effective employment contract in
-`PAY_EMP_CONT` before importing. The import does not create employment history
+`INC_EMP_CONT` before importing. The import does not create employment history
 implicitly; it fails when no contract covers the payroll payment date.
 
 ```bash
@@ -216,7 +216,7 @@ Import notes:
 - `pension_plan_id` and `health_plan_id` are optional, but must be provided together
 - `health_plan_id` accepts one id or multiple ids separated by commas (for example `2,3`); the informational `contracted_uf`/`contracted_clp` fields sum each plan's `contracted_uf`, prorated by how many days of the period's calendar month that plan's `valid_from`/`valid_to` actually overlaps (a plan valid the whole month contributes its full value; a plan that only starts or ends mid-month contributes a day-weighted fraction). The mandatory-minimum-vs-contracted `additional_amount_clp` discount is computed separately, by splitting the month into sub-periods of constant plan composition and applying the mandatory-minimum comparison once per sub-period rather than once for the whole month -- this matters whenever a mid-month plan change crosses the mandatory-minimum threshold partway through (see `domain/health_plan_proration.py`'s `prorated_additional_amount_clp()` and [`https://github.com/mrturo-pf/pf-improvements/blob/main/improvements/HIST-010-health-additional-uf-mismatch/investigation.md`](https://github.com/mrturo-pf/pf-improvements/blob/main/improvements/HIST-010-health-additional-uf-mismatch/investigation.md), Session 11, for a real example)
 - when `pension_plan_id`/`health_plan_id` are omitted, both are deduced from every active reference-data plan overlapping the period's month, not just the plan valid on the 1st -- a plan that only takes effect partway through the month is still assigned and prorated the same way
-- `employer` is required and must identify an employer with an effective `PAY_EMP_CONT` contract for `payment_date`
+- `employer` is required and must identify an employer with an effective `INC_EMP_CONT` contract for `payment_date`
 - `net_pay` is optional; if present, the imported period is marked as `actual`, otherwise it is marked as `projected`
 - `net_pay` is **not** imported as a payroll concept row
 - when `net_pay` is present, the import response stores the declared value and marks reconciliation as pending until computed contributions and income tax are generated

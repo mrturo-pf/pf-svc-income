@@ -877,7 +877,7 @@ async def _assert_import_rows_reconciles_net_pay(
             FakeResult(),
             # _reconcile_period_net_pay(): available concept codes on the period
             FakeResult(scalar_rows=list(review_required_codes)),
-            # _reconcile_period_net_pay(): PAY_MV_SUMARY.net_pay_clp
+            # _reconcile_period_net_pay(): INC_MV_PAY_SUMMARY.net_pay_clp
             FakeResult(scalar_one=Decimal("900000")),
         ]
     )
@@ -1866,7 +1866,7 @@ async def test_list_period_ranges_resolves_names_for_other_employers() -> None:
             FakeResult(first_row=(current_period, current_employer)),
             FakeResult(scalar_rows=[previous_period]),
             FakeResult(joined_rows=[]),  # salary_base/fixed_uf_clp aggregates
-            FakeResult(joined_rows=[]),  # PAY_MV_SUMARY amounts
+            FakeResult(joined_rows=[]),  # INC_MV_PAY_SUMMARY amounts
             FakeResult(joined_rows=[(2, "OTHER CO")]),  # other employer names
         ]
     )
@@ -3528,7 +3528,7 @@ async def test_sqlalchemy_payroll_repository_lists_period_ranges_projects_all_fu
             FakeResult(first_row=(current_period, current_employer)),
             FakeResult(scalar_rows=[previous_period]),
             FakeResult(joined_rows=[]),  # salary_base aggregation
-            FakeResult(joined_rows=[]),  # PAY_MV_SUMARY amounts
+            FakeResult(joined_rows=[]),  # INC_MV_PAY_SUMMARY amounts
             FakeResult(joined_rows=items),  # predict_next_period_net_pay's items
         ]
     )
