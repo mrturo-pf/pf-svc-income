@@ -44,7 +44,7 @@ from payroll.shared.dates import (
     resolve_last_increase_period,
 )
 
-_NET_PAY_QUANT = Decimal("0.01")
+_NET_INC_QUANT = Decimal("0.01")
 _IPC_CODE = "IPC_CL"
 _NO_INCREASE_PCT = Decimal("0.00")
 
@@ -282,8 +282,8 @@ async def predict_next_period_net_pay(
     # -- see PredictedNetPayBaseline's docstring). Quantize both to cents
     # *before* subtracting so net_pay_clp == scalable_clp - fixed_uf_clp
     # holds exactly, with no independent-rounding drift between the two.
-    scalable_clp = (future_gross - future_non_uf_discounts).quantize(_NET_PAY_QUANT)
-    fixed_uf_clp = future_uf_discounts.quantize(_NET_PAY_QUANT)
+    scalable_clp = (future_gross - future_non_uf_discounts).quantize(_NET_INC_QUANT)
+    fixed_uf_clp = future_uf_discounts.quantize(_NET_INC_QUANT)
     predicted_net_pay = scalable_clp - fixed_uf_clp
 
     if predicted_net_pay <= 0:
@@ -440,7 +440,7 @@ async def _apply_ipc_step(
         return current_scalable, last_increase_period, _NO_INCREASE_PCT
     increase_pct = quantize_percent((total_ratio - 1) * 100)
     stepped = (
-        (current_scalable * total_ratio).quantize(_NET_PAY_QUANT)
+        (current_scalable * total_ratio).quantize(_NET_INC_QUANT)
         if current_scalable is not None
         else None
     )
@@ -694,7 +694,7 @@ class SqlAlchemyPayrollRepositoryBase:
         """Handle refresh summary view."""
         await self._session.commit()
         await self._session.execute(
-            text('SELECT public."INC_FN_REFRESH_PAY_SUMMARY"()')
+            text('SELECT public."INC_FN_REFRESH_INC_SUMMARY"()')
         )
         await self._session.commit()
 

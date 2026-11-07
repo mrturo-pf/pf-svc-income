@@ -1,7 +1,7 @@
 """Payroll PDF templates: employer-specific label -> concept_code mapping.
 
 Templates are compiled from `PdfTemplateDTO` instances read out of pf-db's
-`PAY_PDF_TEMPLATE` / `PAY_PDF_TEMPLATE_FIELD` tables (via the
+`INC_PDF_TEMPLATE` / `INC_PDF_TEMPLATE_FIELD` tables (via the
 `TemplateReader` port, see `application/ports/template_repository.py`) --
 no longer from git-tracked JSON files. Management (create/modify/logical
 delete) happens through `POST`/`PUT`/`DELETE /payroll/templates*` (see

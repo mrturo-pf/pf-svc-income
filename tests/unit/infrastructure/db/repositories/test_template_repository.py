@@ -28,17 +28,17 @@ _EMPLOYER_NAMES = {_EMPLOYER_ID: "ACME"}
 
 
 def _resolve_concepts_row() -> tuple[str, int, ModelPayrollConceptKind]:
-    """Build one PAY_CONCEPT row shaped for resolve_concepts() (code, id, kind)."""
+    """Build one INC_CONCEPT row shaped for resolve_concepts() (code, id, kind)."""
     return ("SALARY_BASE", _SALARY_BASE_CONCEPT_ID, ModelPayrollConceptKind.INCOME)
 
 
 def _concepts_by_id_row() -> tuple[int, str, ModelPayrollConceptKind]:
-    """Build one PAY_CONCEPT row shaped for _load_concepts_by_id() (id, code, kind)."""
+    """Build one INC_CONCEPT row shaped for _load_concepts_by_id() (id, code, kind)."""
     return (_SALARY_BASE_CONCEPT_ID, "SALARY_BASE", ModelPayrollConceptKind.INCOME)
 
 
 def _employer_name_row() -> tuple[int, str]:
-    """Build one PAY_EMPLOYER row shaped for _load_employer_names() (id, name)."""
+    """Build one INC_EMPLOYER row shaped for _load_employer_names() (id, name)."""
     return (_EMPLOYER_ID, "ACME")
 
 

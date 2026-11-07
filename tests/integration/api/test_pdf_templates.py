@@ -93,7 +93,7 @@ class FakeTemplateRepository:
         return deactivated
 
     async def resolve_concepts(self, codes: set[str]) -> dict[str, ConceptRef]:
-        """Fake PAY_CONCEPT lookup -- a fixed, known-good map."""
+        """Fake INC_CONCEPT lookup -- a fixed, known-good map."""
         known = {
             "SALARY_BASE": ConceptRef(id=1, kind="income"),
             "INCOME_TAX": ConceptRef(id=2, kind="discount"),
@@ -185,7 +185,7 @@ def test_create_template_rejects_empty_fields_list() -> None:
 
 
 def test_create_template_rejects_unknown_concept_code() -> None:
-    """A concept_code with no matching PAY_CONCEPT row is a 400, not a silent guess.
+    """A concept_code with no matching INC_CONCEPT row is a 400, not a silent guess.
 
     This is the server-side half of the kind-derivation fix: the client no
     longer sends `kind` at all (see pf-db migration 0010), so the only way to

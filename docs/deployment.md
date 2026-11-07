@@ -70,7 +70,7 @@ Push to main after merge
 3. **DB URL via `--set-secrets` only** — never `--set-env-vars`
    ```bash
    #  Correct
-   --set-secrets=PF_DATABASE_URL=pf-db-url:latest
+   --set-secrets=PF_DATABASE_URL=PF_DATABASE_URL:latest
    
    #  Wrong (exposes secret in gcloud describe)
    --set-env-vars=PF_DATABASE_URL=postgresql://...
@@ -120,7 +120,7 @@ Configure the following secrets in the repository (Settings → Secrets and vari
 |---|:---:|---|
 | `GCP_SA_KEY` |  | Service-account JSON key with roles: `roles/run.admin`, `roles/iam.serviceAccountUser`, `roles/artifactregistry.writer` |
 | `GCP_PROJECT_ID` |  | GCP project ID (e.g., `my-project-123`) |
-| `PF_DATABASE_URL` |  | Connection string stored in Secret Manager, injected into Cloud Run at runtime |
+| `PF_DATABASE_URL` |  | Database connection string stored in Secret Manager and injected into Cloud Run at runtime |
 | `GCP_CLOUD_SQL_INSTANCE` | optional | Cloud SQL instance in `PROJECT:REGION:INSTANCE` format (leave empty for external DB) |
 | `MAIL_SERVER` |  | SMTP server hostname (e.g., `smtp.gmail.com`) |
 | `MAIL_PORT` |  | SMTP port (e.g., `587` for STARTTLS) |
@@ -207,7 +207,7 @@ gcloud run deploy pf-svc-income \
   --image=us-central1-docker.pkg.dev/PROJECT_ID/pf-svc-income/app:manual \
   --region=us-central1 \
   --platform=managed \
-  --set-secrets=PF_DATABASE_URL=pf-db-url:latest \
+  --set-secrets=PF_DATABASE_URL=PF_DATABASE_URL:latest \
   --min-instances=0 \
   --max-instances=2 \
   --memory=512Mi \

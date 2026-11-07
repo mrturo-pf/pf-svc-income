@@ -142,7 +142,7 @@ def test_export_dataframe_omits_computed_columns_when_period_has_none() -> None:
 
 
 def test_export_dataframe_leaves_net_pay_blank_without_a_summary() -> None:
-    """A period with no PAY_MV_SUMARY row yet exports an empty net_pay cell."""
+    """A period with no INC_MV_PAY_SUMMARY row yet exports an empty net_pay cell."""
     dataframe = build_export_dataframe([_build_detail(net_pay=None)])
     assert dataframe.iloc[0]["net_pay"] is None or dataframe.iloc[0].isna()["net_pay"]
 
@@ -213,7 +213,7 @@ def test_export_dataframe_skips_a_concept_with_no_column_at_all() -> None:
     Not an expected case today (see design recommendation Item 1 -- every
     persistable concept has a column or is one of the two known
     computed-only ones), but a visible no-op rather than a KeyError if
-    PAY_CONCEPT ever grows a new code neither side of this pipeline knows
+    INC_CONCEPT ever grows a new code neither side of this pipeline knows
     about yet -- the CONCEPT_MAP-drift tests in
     tests/integration/api/test_payroll_export_roundtrip.py are what should
     catch that drift, not an exception raised mid-export.

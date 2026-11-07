@@ -81,30 +81,30 @@ pf-svc-income **owns** the following tables (writes allowed):
 
 | Table | Description |
 |---|---|
-| `PAY_EMPLOYER` | Employer entities |
-| `PAY_PERIOD` | Payroll periods (month/year + payment date) |
-| `PAY_PRD_HLTH` | Health plan selections per period |
-| `PAY_PRD_COMP` | Complementary insurance per period |
-| `PAY_CONCEPT` | Custom payroll concepts (bonuses, deductions) |
-| `PAY_ITEM` | Individual payroll line items |
+| `INC_EMPLOYER` | Employer entities |
+| `INC_PAYROLL` | Payroll periods (month/year + payment date) |
+| `INC_PRD_HLTH` | Health plan selections per period |
+| `INC_PRD_COMP` | Complementary insurance per period |
+| `INC_CONCEPT` | Custom payroll concepts (bonuses, deductions) |
+| `INC_ITEM` | Individual payroll line items |
 
 ### Reference data tables
 
 | Table | Description |
 |---|---|
-| `PAY_PENS_INST` | AFP institutions (e.g., Capital, Cuprum, Habitat) |
-| `PAY_HLTH_INST` | Health institutions (e.g., Fonasa, Isapres) |
-| `PAY_PENS_PLAN` | Pension plan types |
-| `PAY_HLTH_PLAN` | Health plan types |
-| `PAY_CNTRB_CAP` | Monthly contribution caps (UF-based) |
-| `PAY_COMP_PROV` | Insurance providers |
-| `PAY_COMP_PLAN` | Insurance plan types |
+| `INC_PENS_INST` | AFP institutions (e.g., Capital, Cuprum, Habitat) |
+| `INC_HLTH_INST` | Health institutions (e.g., Fonasa, Isapres) |
+| `INC_PENS_PLAN` | Pension plan types |
+| `INC_HLTH_PLAN` | Health plan types |
+| `INC_CNTRB_CAP` | Monthly contribution caps (UF-based) |
+| `INC_COMP_PROV` | Insurance providers |
+| `INC_COMP_PLAN` | Insurance plan types |
 
 ### Analytics
 
 | View | Type | Description |
 |---|---|---|
-| `PAY_MV_SUMARY` | Materialized view | Aggregated payroll summaries |
+| `INC_MV_PAY_SUMMARY` | Materialized view | Aggregated payroll summaries |
 
 ## Tables accessed (read-only)
 
@@ -125,8 +125,8 @@ SQLAlchemy models live in `infrastructure/db/models/`:
 
 | File | Tables |
 |---|---|
-| `payroll.py` | `PAY_EMPLOYER`, `PAY_PERIOD`, `PAY_PRD_HLTH`, `PAY_PRD_COMP`, `PAY_CONCEPT`, `PAY_ITEM`, `PAY_MV_SUMARY` |
-| `reference_data.py` | `PAY_PENS_INST`, `PAY_HLTH_INST`, `PAY_PENS_PLAN`, `PAY_HLTH_PLAN`, `PAY_CNTRB_CAP`, `PAY_COMP_PROV`, `PAY_COMP_PLAN` |
+| `payroll.py` | `INC_EMPLOYER`, `INC_PAYROLL`, `INC_PRD_HLTH`, `INC_PRD_COMP`, `INC_CONCEPT`, `INC_ITEM`, `INC_MV_PAY_SUMMARY` |
+| `reference_data.py` | `INC_PENS_INST`, `INC_HLTH_INST`, `INC_PENS_PLAN`, `INC_HLTH_PLAN`, `INC_CNTRB_CAP`, `INC_COMP_PROV`, `INC_COMP_PLAN` |
 
 ### Example: Employer model
 
@@ -138,7 +138,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from payroll.infrastructure.db.models.base import Base
 
 class EmployerModel(Base):
-    __tablename__ = "PAY_EMPLOYER"
+    __tablename__ = "INC_EMPLOYER"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(120), unique=True)
@@ -182,13 +182,13 @@ To add a new column or table:
    ```python
    def upgrade() -> None:
        op.execute("""
-           ALTER TABLE "PAY_EMPLOYER" 
+           ALTER TABLE "INC_EMPLOYER"
            ADD COLUMN industry VARCHAR(100);
        """)
    
    def downgrade() -> None:
        op.execute("""
-           ALTER TABLE "PAY_EMPLOYER" 
+           ALTER TABLE "INC_EMPLOYER"
            DROP COLUMN industry;
        """)
    ```
@@ -223,13 +223,13 @@ Common queries:
 \dt
 
 -- Describe a table
-\d "PAY_EMPLOYER"
+\d "INC_EMPLOYER"
 
 -- Count payroll periods
-SELECT COUNT(*) FROM "PAY_PERIOD";
+SELECT COUNT(*) FROM "INC_PAYROLL";
 
 -- Show recent payroll items
-SELECT * FROM "PAY_ITEM" ORDER BY id DESC LIMIT 10;
+SELECT * FROM "INC_ITEM" ORDER BY id DESC LIMIT 10;
 ```
 
 ### Using Adminer

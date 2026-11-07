@@ -9,7 +9,7 @@ CONCEPT_MAP) -- rather than against a live database.
 
 Why not a live-Postgres round trip (testcontainers, mirroring
 tests/integration/infrastructure/test_transactional_session.py): that would
-also require pf-db's migrations plus seeded reference data (PAY_CONCEPT,
+also require pf-db's migrations plus seeded reference data (INC_CONCEPT,
 pension/health institutions and plans, an employer) just to construct one
 persistable period -- a much bigger lift than this feature's own scope, and
 cross-repo by nature (pf-db owns that schema/seed data). The real, permanent

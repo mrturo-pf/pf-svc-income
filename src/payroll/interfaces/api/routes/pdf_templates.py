@@ -47,10 +47,10 @@ def _compiles_as_regex(value: str) -> str:
 class TemplateFieldRequest(BaseModel):
     """Represent one label-to-concept mapping rule in a create/update request.
 
-    No `kind` field -- it would duplicate PAY_CONCEPT.kind with no way for
+    No `kind` field -- it would duplicate INC_CONCEPT.kind with no way for
     this schema to guarantee the two stay in sync. The server always resolves
     kind from `concept_code` instead (see `_resolve_field_dtos()` below); a
-    `concept_code` with no matching PAY_CONCEPT row is a 400, not a bad guess.
+    `concept_code` with no matching INC_CONCEPT row is a 400, not a bad guess.
     """
 
     pdf_label_pattern: str
@@ -69,11 +69,11 @@ class TemplateWriteRequest(BaseModel):
     """Share the fields common to create and update requests.
 
     `employer_id` is required: a template may only be created for an
-    employer that already has a `PAY_EMPLOYER` row (i.e. after its first
+    employer that already has a `INC_EMPLOYER` row (i.e. after its first
     payroll import has run; there is no standalone endpoint to create one
     ahead of that -- see pf-db migration 0012). There is no `employer_name`
     field -- nothing to supply; the display name shown in responses is
-    always resolved fresh from `PAY_EMPLOYER.name` via `employer_id`.
+    always resolved fresh from `INC_EMPLOYER.name` via `employer_id`.
     """
 
     employer_id: int
@@ -156,10 +156,10 @@ def _to_read_model(dto: PdfTemplateDTO) -> TemplateRead:
 async def _resolve_field_dtos(
     fields: list[TemplateFieldRequest], repository: TemplateRepository
 ) -> list[PdfTemplateFieldDTO]:
-    """Resolve each field's kind from PAY_CONCEPT, never trusting a client value.
+    """Resolve each field's kind from INC_CONCEPT, never trusting a client value.
 
     Raises PayrollValidationError (-> 400) for any concept_code with no
-    matching PAY_CONCEPT row, before ever attempting to write a field --
+    matching INC_CONCEPT row, before ever attempting to write a field --
     earlier and clearer than letting the FK constraint fail during commit.
     """
     codes = {field.concept_code for field in fields}

@@ -174,7 +174,7 @@ def _corporative_chile_v1_dto() -> PdfTemplateDTO:
 
     This is a Python-literal mirror of the former
     infrastructure/pdf_import/templates/walmart-chile/v1.json (deleted --
-    templates now live in pf-db's PAY_PDF_TEMPLATE*, see
+    templates now live in pf-db's INC_PDF_TEMPLATE*, see
     docs/proposals/pdf-template-management-plan.md), and of the
     identical data seeded by pf-db's db/04_seed_real.sql. Kept here, not
     read from a live database, so this remains a DB-free *unit* test of the
@@ -335,7 +335,7 @@ class TestPayslipVariantConceptCoverage:
     holiday bonus, a vacation bonus, an availability bonus, or a prior-month
     salary/leave adjustment, none of which appear in a bare monthly payslip.
     Every one of them already had a matching concept_code in pf-db's
-    PAY_CONCEPT seed data (used by the CSV/XLSX importer already), so this
+    INC_CONCEPT seed data (used by the CSV/XLSX importer already), so this
     was a template gap, not a missing domain concept.
     """
 
@@ -387,7 +387,7 @@ class TestCcafLoanConceptCoverage:
     2026-09: 'CCAF LA ARAUCANA VIGENTE' showed up in a real Walmart-Chile
     payslip (Liquidacion_202609.PDF) with no matching concept_code at all --
     unlike the payslip-variant gaps above, this was a genuinely new domain
-    concept (CCAF_LOAN), added to pf-db's PAY_CONCEPT seed data together with
+    concept (CCAF_LOAN), added to pf-db's INC_CONCEPT seed data together with
     this template field. The pattern is deliberately not anchored to 'LA
     ARAUCANA' specifically: an employee affiliated with a different CCAF
     (Los Andes, Los Heroes, 18 de Septiembre) gets the same '<CCAF NAME>

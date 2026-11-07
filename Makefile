@@ -1,5 +1,5 @@
 # ============================================================================
-# pf-payroll - Chilean payroll microservice
+# pf-svc-income - Chilean payroll and income microservice
 # ============================================================================
 
 # Service configuration (REQUIRED by common.mk)

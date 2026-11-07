@@ -360,13 +360,13 @@ class PdfImportPreviewDTO:
 
 @dataclass(frozen=True, slots=True)
 class ConceptRef:
-    """Minimal PAY_CONCEPT projection needed to resolve a template field.
+    """Minimal INC_CONCEPT projection needed to resolve a template field.
 
     Returned by `TemplateRepository.resolve_concepts()`, keyed by
     `concept_code` -- carries exactly what a write needs (`id`, to store in
-    `PAY_PDF_TEMPLATE_FIELD.concept_id`) and what a client-facing response
+    `INC_PDF_TEMPLATE_FIELD.concept_id`) and what a client-facing response
     needs (`kind`, since `PdfTemplateFieldDTO`/the API never store it, only
-    ever resolve it fresh from `PAY_CONCEPT`). The one DTO allowed to cross
+    ever resolve it fresh from `INC_CONCEPT`). The one DTO allowed to cross
     the `TemplateRepository` port boundary for this lookup -- see pf-db
     migration 0011 for why the storage column is `concept_id`, not
     `concept_code`.
@@ -400,14 +400,14 @@ class PdfTemplateDTO:
     `id`/field `id`s are `None` for a not-yet-persisted template (a create
     request); always populated for anything read back from storage.
     `employer_id` is required -- a template may only be created for an
-    employer that already has a `PAY_EMPLOYER` row (i.e. after its first
+    employer that already has a `INC_EMPLOYER` row (i.e. after its first
     payroll import has run; there is no standalone endpoint to create one
     ahead of that). It is never read by `select_template()`/`match_field()`,
     which keep matching purely against `employer_match_pattern` (a regex over
     the raw PDF text), unchanged. `employer_name` follows the same
     None-only-on-write precedent as `id`: always `None` on a create/update
     request (there is nothing to supply -- the repository never stores a copy
-    of `PAY_EMPLOYER.name`, see pf-db migration 0012); always a resolved,
+    of `INC_EMPLOYER.name`, see pf-db migration 0012); always a resolved,
     non-None string for anything read back from storage.
     """
 
