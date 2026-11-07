@@ -50,7 +50,10 @@ local-up: ## Start full local stack (DB verification, env, deps, API)
 
 # Override clean to add service-specific artifacts
 .PHONY: clean
-clean: ## Remove build artifacts, caches, and service-specific files
-	@$(MAKE) -f ../pf-common/make/common.mk clean
+clean: clean-common ## Remove build artifacts, caches, and service-specific files
 	rm -f payroll-dashboard.html
 	find . -maxdepth 1 -name "*.pdf" -delete
+
+# Ensure the shared reinstall workflow uses this service's clean first.
+.PHONY: reinstall
+reinstall: clean ## Run local cleanup, then the shared dependency installation
