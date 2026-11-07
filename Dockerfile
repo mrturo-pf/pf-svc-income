@@ -41,17 +41,18 @@ RUN apt-get update \
 # Migrations are managed by pf-db — this image ships no migration tooling.
 COPY --from=builder /opt/venv /opt/venv
 
-# The base image's system pip AND our venv's pip both vendor an old
-# msgpack/setuptools that trip Trivy with known HIGH severity CVEs
-# (CVE-2025-47273, GHSA-6v7p-g79w-8964) via pip's internal vendor
-# manifest. Confirmed by elimination: removing only the system pip had
-# zero effect, so the venv's own pip (copied in above) is the real
-# culprit. Nothing at runtime uses pip in either location — the app
-# runs via uvicorn from /opt/venv — so delete pip from both.
-RUN rm -rf /opt/venv/lib/python3.12/site-packages/pip* \
-           /opt/venv/bin/pip* \
-           /usr/local/lib/python3.12/site-packages/pip* \
-           /usr/local/bin/pip*
+# The image does not use pip, setuptools, or msgpack at runtime. Their
+# vendored metadata can trigger known HIGH severity CVEs in Trivy
+# (CVE-2025-47273, GHSA-6v7p-g79w-8964), so remove the unused tooling and
+# its package metadata from both the copied venv and the base image.
+# Keep the filesystem sweep broad because package locations vary between
+# Python slim image revisions.
+RUN /usr/local/bin/pip uninstall -y setuptools msgpack 2>/dev/null || true; \
+    find /usr -xdev -depth \
+      \( -iname 'pip*' -o -iname 'setuptools*' -o -iname 'msgpack*' \
+         -o -iname '_distutils_hack' -o -iname 'pkg_resources' \) \
+      -print -exec rm -rf {} +; \
+    true
 
 RUN useradd --no-create-home --shell /bin/false appuser
 USER appuser
