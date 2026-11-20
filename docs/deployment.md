@@ -120,7 +120,7 @@ Configure the following secrets in the repository (Settings → Secrets and vari
 |---|:---:|---|
 | `GCP_SA_KEY` |  | Service-account JSON key with roles: `roles/run.admin`, `roles/iam.serviceAccountUser`, `roles/artifactregistry.writer` |
 | `GCP_PROJECT_ID` |  | GCP project ID (e.g., `my-project-123`) |
-| `PF_DATABASE_URL` |  | Database connection string secret; injected into Cloud Run as runtime env `PF_DATABASE_URL` |
+| `PF_DATABASE_URL` |  | Database connection string stored in Secret Manager and injected into Cloud Run at runtime |
 | `GCP_CLOUD_SQL_INSTANCE` | optional | Cloud SQL instance in `PROJECT:REGION:INSTANCE` format (leave empty for external DB) |
 | `MAIL_SERVER` |  | SMTP server hostname (e.g., `smtp.gmail.com`) |
 | `MAIL_PORT` |  | SMTP port (e.g., `587` for STARTTLS) |
