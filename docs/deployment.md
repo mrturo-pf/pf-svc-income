@@ -161,7 +161,7 @@ The pipeline supports two database configurations:
 | **CPU** | `1` | Single vCPU |
 | **Port** | `8000` | FastAPI default (Cloud Run injects `PORT` env var) |
 | **Service account** | `pf-svc-income@<PROJECT>.iam.gserviceaccount.com` | Needs `roles/secretmanager.secretAccessor` |
-| **Secrets** | `PF_DATABASE_URL` from Secret Manager | Never use `--set-env-vars` |
+| **Secrets** | `PF_DATABASE_URL` injected as runtime env `PF_DATABASE_URL` | Never use `--set-env-vars` |
 
 The application database engine uses the approved `pf-db` connection contract:
 `pool_size=5`, `max_overflow=0`, `pool_pre_ping=True`, and

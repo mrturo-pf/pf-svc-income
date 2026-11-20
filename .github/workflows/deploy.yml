@@ -97,7 +97,7 @@
 # see the "Deploy to Cloud Run" step in deploy-reusable.yml.
 #
 # Secret Manager Secrets (auto-injected by reusable workflow):
-#   PF_DATABASE_URL                 — Database connection string
+#   PF_DATABASE_URL      — Database connection string
 #   PF_RATES_API_KEY                — API key for calling pf-rates service
 #   PF_INCOME_API_KEY              — API key for this service
 #
