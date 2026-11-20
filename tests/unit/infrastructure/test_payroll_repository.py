@@ -887,6 +887,9 @@ async def _assert_import_rows_reconciles_net_pay(
         _build_net_pay_reconciliation_rows(declared_codes)
     )
 
+    assert any(
+        "INC_FN_REFRESH_PAY_SUMMARY" in str(statement) for statement in session.executed
+    )
     assert result.imported_periods == 1
     assert result.imported_items == len(declared_codes)
     assert result.periods[0].expected_net_pay_clp == Decimal("900000")
