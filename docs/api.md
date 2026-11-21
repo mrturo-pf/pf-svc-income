@@ -23,7 +23,7 @@ This section is the **complete inventory of HTTP endpoints** currently exposed b
 
 pf-svc-income does **not** expose its own market-data endpoints. Exchange rates, economic
 indices, and income tax brackets are fetched read-only from **pf-rates** over HTTP
-through `MarketDataRepository` (configured via `PF_RATES_URL` / `PF_RATES_API_KEY`,
+through `MarketDataRepository` (configured via `PF_REFERENCE_URL` / `PF_REFERENCE_API_KEY`,
 see [Getting Started](getting-started.md)). pf-rates itself owns the default-provider
 behavior (SII lookups for `UTM`/`IPC_CL`, `mindicador` fallback for `UF`/`USD`/`EUR`,
 optional BCCh credentials) and the startup background sync — see

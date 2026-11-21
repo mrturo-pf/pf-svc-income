@@ -129,10 +129,10 @@ Configure the following secrets in the repository (Settings → Secrets and vari
 | `MAIL_FROM` |  | Sender display address (e.g., `pf-svc-income CI <you@gmail.com>`) |
 | `MAIL_TO` |  | Recipient address(es), comma-separated |
 
-> **pf-rates connectivity is automatic.** `PF_RATES_URL` is not a secret you
+> **pf-rates connectivity is automatic.** `PF_REFERENCE_URL` is not a secret you
 > configure -- the deploy pipeline resolves pf-rates' live Cloud Run URL at
 > deploy time (`gcloud run services describe pf-rates`) and injects it as a
-> plain env var. `PF_RATES_API_KEY` (the credential half) still comes from
+> plain env var. `PF_REFERENCE_API_KEY` (the credential half) still comes from
 > Secret Manager, same as `PF_DATABASE_URL`.
 
 ### Database options
