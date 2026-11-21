@@ -192,7 +192,7 @@ cd ../pf-rates
 make local-up
 ```
 
-Check `PF_RATES_URL` in `.env` points to the correct URL (default: `http://localhost:8001`).
+Check `PF_REFERENCE_URL` in `.env` points to the correct URL (default: `http://localhost:8001`).
 
 ### Integration tests fail: "testcontainers timeout"
 

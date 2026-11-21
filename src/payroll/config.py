@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     )
     api_base_url: str = "http://127.0.0.1:8000"
     log_level: str = "INFO"
-    pf_rates_base_url: str = Field(default="", validation_alias="PF_RATES_URL")
-    pf_rates_api_key: str = Field(default="", validation_alias="PF_RATES_API_KEY")
+    pf_rates_base_url: str = Field(default="", validation_alias="PF_REFERENCE_URL")
+    pf_rates_api_key: str = Field(default="", validation_alias="PF_REFERENCE_API_KEY")
     pf_income_api_key: str = Field(validation_alias="PF_INCOME_API_KEY")
     pf_rates_cache_ttl_seconds: int = 300
 

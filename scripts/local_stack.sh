@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../../pf-common/scripts/local_stack_common.sh
 source "$SCRIPT_DIR/../../pf-common/scripts/local_stack_common.sh"
 PF_DATABASE_URL="${PF_DATABASE_URL:-postgresql+asyncpg://pf_db:pf_db@localhost:5432/pf_db}"
-PF_RATES_URL="${PF_RATES_URL:-http://localhost:8001}"
+PF_REFERENCE_URL="${PF_REFERENCE_URL:-http://localhost:8001}"
 PF_INCOME_API_KEY="${PF_INCOME_API_KEY:-change-me-before-use}"
 CORPORATIVE_PIP_INDEX="${CORPORATIVE_PIP_INDEX:-}"
 CORPORATIVE_NPM_REGISTRY="${CORPORATIVE_NPM_REGISTRY:-}"
@@ -24,7 +24,7 @@ pf_require_db_container "$DB_CONTAINER"
 
 pf_log "Writing environment file to $ENV_FILE"
 PF_DATABASE_URL="$PF_DATABASE_URL" \
-PF_RATES_URL="$PF_RATES_URL" \
+PF_REFERENCE_URL="$PF_REFERENCE_URL" \
 PF_INCOME_API_KEY="$PF_INCOME_API_KEY" \
 CORPORATIVE_PIP_INDEX="$CORPORATIVE_PIP_INDEX" \
 CORPORATIVE_NPM_REGISTRY="$CORPORATIVE_NPM_REGISTRY" \
