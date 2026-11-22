@@ -1,4 +1,4 @@
-"""HTTP adapter for income tax bracket lookup via pf-rates."""
+"""HTTP adapter for income tax bracket lookup via pf-svc-reference."""
 
 from __future__ import annotations
 
@@ -6,19 +6,19 @@ from datetime import date
 from decimal import Decimal
 
 from payroll.domain.taxes import IncomeTaxBracket
-from payroll.infrastructure.http._http_client import PfRatesClientBase, pf_rates_get
+from payroll.infrastructure.http._http_client import PfRatesClientBase, pf_reference_get
 
 
 class IncomeTaxBracketClient(PfRatesClientBase):
-    """HTTP adapter implementing IncomeTaxBracketPort via pf-rates REST API."""
+    """HTTP adapter implementing IncomeTaxBracketPort via pf-svc-reference REST API."""
 
     async def get_income_tax_bracket(
         self, payment_date: date, taxable_base_utm: Decimal
     ) -> IncomeTaxBracket | None:
-        """Return the bracket from pf-rates for payment_date / taxable_base_utm.
+        """Return the bracket from pf-svc-reference for payment_date / taxable_base_utm.
 
         Returns:
-            The matching IncomeTaxBracket, or None if pf-rates returns 404.
+            The matching IncomeTaxBracket, or None if pf-svc-reference returns 404.
 
         Raises:
             PayrollDependencyError: On any non-404 HTTP error or network failure.
@@ -28,7 +28,7 @@ class IncomeTaxBracketClient(PfRatesClientBase):
         if hit:
             return cached  # type: ignore[return-value]
 
-        data = await pf_rates_get(
+        data = await pf_reference_get(
             f"{self._base_url}/income-tax-brackets",
             {
                 "reference_date": payment_date.isoformat(),

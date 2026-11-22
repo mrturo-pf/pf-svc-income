@@ -10,7 +10,7 @@ import respx
 from payroll.infrastructure.http.pf_rates_client import PfRatesClient
 
 
-BASE_URL = "http://pf-rates.test"
+BASE_URL = "http://pf-svc-reference.test"
 
 
 def _client() -> PfRatesClient:

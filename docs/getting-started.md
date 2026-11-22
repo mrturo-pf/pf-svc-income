@@ -182,13 +182,13 @@ uvicorn payroll.interfaces.api.main:app --port 8002 --reload
 3. In Swagger UI, use the **Authorize** button (not query param)
 4. In curl, use header: `-H "X-API-Key: your-key"`
 
-### pf-rates connection error
+### pf-svc-reference connection error
 
-**Error:** `Failed to connect to pf-rates`
+**Error:** `Failed to connect to pf-svc-reference`
 
-**Solution:** Start the pf-rates service (required for tax calculations):
+**Solution:** Start the pf-svc-reference service (required for tax calculations):
 ```bash
-cd ../pf-rates
+cd ../pf-svc-reference
 make local-up
 ```
 

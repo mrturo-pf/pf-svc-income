@@ -1,1 +1,1 @@
-"""Rate providers — removed; functionality moved to pf-rates microservice."""
+"""Rate providers — removed; functionality moved to pf-svc-reference microservice."""

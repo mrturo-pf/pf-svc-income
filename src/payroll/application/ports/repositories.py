@@ -247,7 +247,7 @@ class ComplementaryInsuranceRepository(Protocol):
 
 
 class MarketDataRepository(Protocol):
-    """Read port for financial market data served by pf-rates."""
+    """Read port for financial market data served by pf-svc-reference."""
 
     async def get_exchange_rate_value(
         self, currency_code: str, rate_date: date

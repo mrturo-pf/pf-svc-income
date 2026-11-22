@@ -609,7 +609,7 @@ def _compute_net_pay_clp_today(
 
     Both `item`'s own and today's UF/CLP rate are derived purely from
     already-resolved DTO fields (`net_pay_clp / net_pay_uf`, per period --
-    see resolve_currency_equivalents()), so no extra `pf-rates` lookup is
+    see resolve_currency_equivalents()), so no extra `pf-svc-reference` lookup is
     needed here, same as before this split.
 
     None whenever any ingredient is missing: no `current` period, either

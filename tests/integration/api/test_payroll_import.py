@@ -368,9 +368,10 @@ def test_payroll_import_returns_502_when_processing_raises_dependency_error() ->
         async def execute(
             self, result: ImportPayrollResultDTO
         ) -> ImportPayrollResultDTO:
-            """Raise to simulate pf-rates being unreachable."""
+            """Raise to simulate pf-svc-reference being unreachable."""
             raise PayrollDependencyError(
-                "Network error fetching exchange rate from pf-rates: missing protocol"
+                "Network error fetching exchange rate from "
+                "pf-svc-reference: missing protocol"
             )
 
     scope = FakeTransactionalSessionScope()
@@ -390,7 +391,7 @@ def test_payroll_import_returns_502_when_processing_raises_dependency_error() ->
         app.dependency_overrides.clear()
 
     assert response.status_code == 502
-    assert "pf-rates" in response.json()["detail"]
+    assert "pf-svc-reference" in response.json()["detail"]
     assert scope.resolved_with == ["validate"]
 
 

@@ -108,16 +108,16 @@ pf-svc-income **owns** the following tables (writes allowed):
 
 ## Tables accessed (read-only)
 
-pf-svc-income **reads** these tables owned by [pf-rates](https://github.com/mrturo-pf/pf-rates):
+pf-svc-income **reads** these tables owned by [pf-svc-reference](https://github.com/mrturo-pf/pf-svc-reference):
 
 | Table | Owner | Access method |
 |---|---|---|
-| `RAT_CURRENCY` | pf-rates | **HTTP API only** (never direct SQL) |
-| `RAT_EXCH_RATE` | pf-rates | **HTTP API only** |
-| `RAT_ECON_INDEX` | pf-rates | **HTTP API only** |
-| `RAT_TAX_BRCKT` | pf-rates | **HTTP API only** |
+| `RAT_CURRENCY` | pf-svc-reference | **HTTP API only** (never direct SQL) |
+| `RAT_EXCH_RATE` | pf-svc-reference | **HTTP API only** |
+| `RAT_ECON_INDEX` | pf-svc-reference | **HTTP API only** |
+| `RAT_TAX_BRCKT` | pf-svc-reference | **HTTP API only** |
 
-**Important:** pf-svc-income accesses financial rates via the **pf-rates HTTP API** — it never queries these tables directly via SQL.
+**Important:** pf-svc-income accesses financial rates via the **pf-svc-reference HTTP API** — it never queries these tables directly via SQL.
 
 ## ORM models
 
@@ -293,7 +293,7 @@ make migrate  # applies all pending migrations
 
 ## Production database
 
-In production, pf-svc-income connects to the same shared database instance as pf-rates.
+In production, pf-svc-income connects to the same shared database instance as pf-svc-reference.
 
 **Database options:**
 - **External** (Neon, Supabase): Set `PF_DATABASE_URL` secret in Secret Manager; it is injected as `PF_DATABASE_URL`
