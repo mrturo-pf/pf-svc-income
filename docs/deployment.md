@@ -56,6 +56,18 @@ Push to main after merge
                     └─> notify-success (on success)
 ```
 
+## API Gateway facade
+
+The current GCP facade is:
+
+```text
+https://pf-backend-gateway-poc-88uq0qjn.uc.gateway.dev/income/*
+```
+
+It routes through `pf-gateway-proxy` and preserves application `X-API-Key` and
+`X-Request-ID`. The direct Cloud Run URL remains available as the rollback path; direct
+URL enforcement is not enabled.
+
 ## Request correlation
 
 Every request receives a canonical UUIDv4 `X-Request-ID` before authentication. The
