@@ -11,6 +11,10 @@ import structlog
 
 from payroll.application.errors import PayrollDependencyError
 from payroll.infrastructure.http._ttl_cache import TTLCache
+from payroll.interfaces.api.request_correlation import (
+    get_or_create_request_id,
+    request_id_header_name,
+)
 
 _logger = structlog.get_logger()
 
@@ -53,8 +57,15 @@ class PfRatesClientBase:
             clock: Injectable monotonic clock for testing TTL expiry.
         """
         self._base_url = base_url.rstrip("/")
-        self._headers = {"X-API-Key": api_key}
+        self._api_key = api_key
         self._cache = TTLCache(cache_ttl_seconds, clock)
+
+    def _request_headers(self) -> dict[str, str]:
+        """Build per-call headers with one ID reused across retries."""
+        return {
+            "X-API-Key": self._api_key,
+            request_id_header_name(): get_or_create_request_id(),
+        }
 
 
 async def _pf_reference_request(

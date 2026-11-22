@@ -6,6 +6,20 @@ Complete reference for all HTTP interfaces exposed by pf-svc-income.
 
 Use the [IMP-006 error baseline and adoption checklist](https://github.com/mrturo-pf/pf-improvements/blob/main/improvements/IMP-006-ecosystem-http-error-baseline/adoption-release-checklist.md) when classifying sanitized contract, dependency, application, and infrastructure evidence.
 
+## Request correlation
+
+Every response includes `X-Request-ID`. Clients may provide a canonical UUIDv4 in
+that request header; valid uppercase UUIDs are normalized to lowercase. If omitted,
+the service generates an ID. Malformed, non-v4, oversized, duplicate, or comma-separated
+values return `400 Bad Request` with a generated error-context ID in the response header.
+The raw invalid value is never logged or echoed.
+
+Example:
+
+```http
+X-Request-ID: 550e8400-e29b-41d4-a716-446655440000
+```
+
 ## HTTP API
 
 This section is the **complete inventory of HTTP endpoints** currently exposed by the application.
@@ -147,6 +161,10 @@ pf-svc-reference' `GET /monetary-units` and `GET /income-tax-brackets` (see
 All supported `pf-svc-income` interfaces are HTTP endpoints documented above. Payroll import, PDF preview, payroll queries, and reference-data queries are available through the HTTP API; no CLI is provided.
 
 ## Error responses
+
+`400` responses caused by an invalid `X-Request-ID` use the existing error envelope and
+include reason code `request_id_malformed` or `request_id_too_long`. The response header
+contains a newly generated valid request ID.
 
 Error handling is applied centrally to every endpoint (except that
 authentication failures continue to use their dedicated `403` response).
