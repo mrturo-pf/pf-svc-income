@@ -1,1 +1,1 @@
-"""Rate provider tests — removed; functionality moved to pf-rates microservice."""
+"""Rate provider tests moved to the pf-svc-reference microservice."""

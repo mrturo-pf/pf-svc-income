@@ -25,11 +25,11 @@ from payroll.domain.contributions import (
 )
 from payroll.infrastructure.http.pf_rates_client import PfRatesClient
 
-_PF_RATES_BASE = "http://pf-rates.integration-test"
+_PF_REFERENCE_BASE = "http://pf-svc-reference.integration-test"
 
 
 class StubPayrollRepository:
-    """Test double for payroll persistence in pf-rates integration tests."""
+    """Test double for payroll persistence in pf-svc-reference integration tests."""
 
     def __init__(self) -> None:
         """Initialize the instance."""
@@ -98,24 +98,26 @@ class StubPayrollRepository:
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_compute_contributions_fetches_uf_from_pf_rates() -> None:
-    """Compute contributions retrieves UF from pf-rates and produces correct amounts.
+async def test_compute_contributions_fetches_uf_from_pf_reference() -> None:
+    """Compute contributions retrieves UF from pf-svc-reference.
+
+    Produces correct amounts for the contribution scenario.
 
     Scenario (amounts proven correct in test_compute_contributions.py):
     - taxable_income = 1,000,000 CLP
-    - UF = 40,000 CLP (mocked pf-rates response)
+    - UF = 40,000 CLP (mocked pf-svc-reference response)
     - Banmedica ISAPRE, contracted_uf = 8.1 → contracted_clp = 324,000
     - caps = 90.0 UF (income is below cap, so no capping applies)
 
     uf_value_clp is omitted from the command so the use case must call
     PfRatesClient.get_exchange_rate_value.
     """
-    uf_route = respx.get(f"{_PF_RATES_BASE}/exchange-rates/value").mock(
+    uf_route = respx.get(f"{_PF_REFERENCE_BASE}/exchange-rates/value").mock(
         return_value=httpx.Response(200, json={"value_clp": "40000.00"})
     )
 
     repository = StubPayrollRepository()
-    client = PfRatesClient(_PF_RATES_BASE, "test-key", cache_ttl_seconds=60)
+    client = PfRatesClient(_PF_REFERENCE_BASE, "test-key", cache_ttl_seconds=60)
     service = ContributionComputationService(repository, client)
 
     result = await service.compute(

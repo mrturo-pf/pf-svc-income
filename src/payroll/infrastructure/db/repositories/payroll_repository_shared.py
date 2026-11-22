@@ -59,7 +59,7 @@ class ProjectedFutureMonth:
     percentage could not be computed/was floored (see _apply_ipc_step).
     `net_pay_clp` is independently nullable: it degrades to None whenever
     there is no first-month UF prediction to replicate/step from (e.g. a
-    pf-rates outage), even on months where increase_pct is still a real,
+    pf-svc-reference outage), even on months where increase_pct is still a real,
     computable number from IPC data alone.
     """
 
@@ -156,14 +156,14 @@ async def predict_next_period_net_pay(
 
     Adjusts income to 30-day accounting month if current period had fewer days.
 
-    UF resolution is delegated entirely to pf-rates (MarketDataRepository):
+    UF resolution is delegated entirely to pf-svc-reference (MarketDataRepository):
     its own GetExchangeRateValue use case already implements a strict
     superset of what this function used to hand-roll against a local
     ExchangeRateModel table (DB hit -> provider fetch -> nearest-prior-date
-    fallback -- see pf-rates' get_exchange_rate_value.py). `None` here means
+    fallback -- see pf-svc-reference' get_exchange_rate_value.py). `None` here means
     either the feature is not wired in (no market_data_repository was
-    passed -- the same as this function's pre-pf-rates stub state) or
-    pf-rates genuinely has no UF value to offer for that date.
+    passed -- the same as this function's pre-pf-svc-reference stub state) or
+    pf-svc-reference genuinely has no UF value to offer for that date.
 
     Returns a `PredictedNetPayBaseline` rather than a bare Decimal so that
     project_future_months() can later scale only the salary_base-driven
@@ -176,7 +176,7 @@ async def predict_next_period_net_pay(
         session: Database session, for reading the current period's items.
         current_period: The current payroll period.
         current_period_end_month: Date in month to extract UF from (e.g., end_date).
-        market_data_repository: Read port for pf-rates-backed UF values. `None`
+        market_data_repository: Read port for pf-svc-reference-backed UF values. `None`
             disables the prediction entirely (returns None immediately).
 
     Returns:
@@ -331,7 +331,7 @@ async def _extrapolate_cycle_ratio(
     Mirrors every other degrade-to-best-available guard in
     `_apply_ipc_step()`: never raises on missing *data*, only propagates a
     genuine `PayrollDependencyError` from `get_economic_index_value()` on a
-    real pf-rates outage, same as every other market-data call in this
+    real pf-svc-reference outage, same as every other market-data call in this
     module.
     """
     real_ratio = latest_value / last_increase_index
@@ -408,7 +408,7 @@ async def _apply_ipc_step(
     lost.
 
     `current_scalable` may be None (no first-month UF prediction to step --
-    e.g. a pf-rates outage at that unrelated step): the increase_pct is
+    e.g. a pf-svc-reference outage at that unrelated step): the increase_pct is
     still computed from IPC data alone when possible, it is only the
     stepped value that stays None, passed through unchanged.
 
@@ -454,7 +454,7 @@ def degraded_future_months(
 
     Shared by project_future_months() itself (no market_data_repository
     wired in) and list_period_ranges() (market_data_repository wired in,
-    but a PayrollDependencyError means pf-rates itself is unreachable right
+    but a PayrollDependencyError means pf-svc-reference itself is unreachable right
     now) -- both degrade identically from the caller's perspective: there
     is no way to check IPC, so increase_pct is 0.00 everywhere, and
     net_pay_clp only survives for month_offset 1 (it never depended on
@@ -505,7 +505,7 @@ async def project_future_months(
     is insufficient to compute a real figure (see _apply_ipc_step).
 
     Like predict_next_period_net_pay(), this function lets
-    PayrollDependencyError propagate on a pf-rates outage rather than
+    PayrollDependencyError propagate on a pf-svc-reference outage rather than
     catching it -- list_period_ranges() is the single try/except boundary
     responsible for degrading gracefully (same convention, see its own
     docstring and degraded_future_months() above).
@@ -593,11 +593,11 @@ def _convert_to_currency(
 
     `rate_or_error` comes straight out of an `asyncio.gather(...,
     return_exceptions=True)` slot: it is either the resolved Decimal rate,
-    None (pf-rates has no rate for that currency/date), or a raised
-    exception object (e.g. PayrollDependencyError on a pf-rates outage).
+    None (pf-svc-reference has no rate for that currency/date), or a raised
+    exception object (e.g. PayrollDependencyError on a pf-svc-reference outage).
     `isinstance(..., Decimal)` filters out both non-Decimal cases in one
     guard; a non-positive rate is also rejected defensively even though
-    pf-rates should never publish one.
+    pf-svc-reference should never publish one.
     """
     if not isinstance(rate_or_error, Decimal) or rate_or_error <= 0:
         return None

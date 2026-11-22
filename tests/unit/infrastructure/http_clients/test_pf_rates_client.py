@@ -15,7 +15,7 @@ from payroll.infrastructure.http.pf_rates_client import (
 )
 
 
-BASE_URL = "http://pf-rates.test"
+BASE_URL = "http://pf-svc-reference.test"
 
 
 @pytest.fixture(autouse=True)
@@ -94,7 +94,7 @@ async def test_get_exchange_rate_value_returns_decimal_on_200() -> None:
 @pytest.mark.asyncio
 @respx.mock
 async def test_get_exchange_rate_value_returns_none_on_404() -> None:
-    """Returns None when pf-rates responds with 404."""
+    """Returns None when pf-svc-reference responds with 404."""
     respx.get(f"{BASE_URL}/exchange-rates/value").mock(return_value=httpx.Response(404))
     value = await _client().get_exchange_rate_value("USD", date(2026, 4, 15))
     assert value is None
@@ -105,7 +105,9 @@ async def test_get_exchange_rate_value_returns_none_on_404() -> None:
 async def test_get_exchange_rate_value_raises_on_5xx() -> None:
     """Raises PayrollDependencyError on server errors."""
     respx.get(f"{BASE_URL}/exchange-rates/value").mock(return_value=httpx.Response(502))
-    with pytest.raises(PayrollDependencyError, match="pf-rates returned HTTP 502"):
+    with pytest.raises(
+        PayrollDependencyError, match="pf-svc-reference returned HTTP 502"
+    ):
         await _client().get_exchange_rate_value("USD", date(2026, 4, 15))
 
 
@@ -127,9 +129,9 @@ async def test_get_exchange_rate_value_retries_transient_network_error() -> None
     """A transient network error is retried and does not surface to the caller.
 
     This is the exact scenario the 2026-10-02 investigation found in
-    practice: pf-rates' own provider cascade (BCCH -> SII -> Mindicador)
+    practice: pf-svc-reference' own provider cascade (BCCH -> SII -> Mindicador)
     occasionally takes long enough that this client's HTTP call to
-    pf-rates times out even though pf-rates itself would have eventually
+    pf-svc-reference times out even though pf-svc-reference itself would have eventually
     answered -- retrying once is enough to paper over that instead of
     degrading to the same `null` a genuine missing rate would produce.
     """
@@ -291,7 +293,7 @@ async def test_get_latest_economic_index_returns_none_on_empty_list() -> None:
 @pytest.mark.asyncio
 @respx.mock
 async def test_get_latest_economic_index_returns_none_on_404() -> None:
-    """Returns None on 404, same as the other pf-rates lookups."""
+    """Returns None on 404, same as the other pf-svc-reference lookups."""
     respx.get(f"{BASE_URL}/economic-indices").mock(return_value=httpx.Response(404))
     result = await _client().get_latest_economic_index("IPC_CL")
     assert result is None
@@ -316,5 +318,7 @@ async def test_get_latest_economic_index_caches_within_ttl() -> None:
 async def test_get_latest_economic_index_raises_on_5xx() -> None:
     """Raises PayrollDependencyError on server errors, same as other lookups."""
     respx.get(f"{BASE_URL}/economic-indices").mock(return_value=httpx.Response(502))
-    with pytest.raises(PayrollDependencyError, match="pf-rates returned HTTP 502"):
+    with pytest.raises(
+        PayrollDependencyError, match="pf-svc-reference returned HTTP 502"
+    ):
         await _client().get_latest_economic_index("IPC_CL")

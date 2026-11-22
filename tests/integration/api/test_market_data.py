@@ -1,1 +1,1 @@
-"""Market data API tests — removed; functionality moved to pf-rates microservice."""
+"""Market data API tests moved to the pf-svc-reference microservice."""

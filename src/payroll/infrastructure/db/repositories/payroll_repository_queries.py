@@ -167,7 +167,7 @@ class SqlAlchemyPayrollQueryRepository(SqlAlchemyPayrollRepositoryBase):
         first_increase_period: date,
         increase_frequency: int,
     ) -> dict[int, ProjectedFutureMonth]:
-        """Project future months, degrading gracefully on a pf-rates outage.
+        """Project future months, degrading gracefully on a pf-svc-reference outage.
 
         Same philosophy as the first_future_net_pay_clp try/except just
         above -- a PayrollDependencyError from project_future_months()'s own
@@ -676,7 +676,7 @@ class SqlAlchemyPayrollQueryRepository(SqlAlchemyPayrollRepositoryBase):
         )
 
         # Calculate predicted net_pay for the first future period. A
-        # PayrollDependencyError (pf-rates unreachable/erroring) must not take
+        # PayrollDependencyError (pf-svc-reference unreachable/erroring) must not take
         # down this otherwise fully DB-only, always-available endpoint over
         # one optional field on one of its 24 rows -- degrade to None instead.
         first_future_baseline: PredictedNetPayBaseline | None = None

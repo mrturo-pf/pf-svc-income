@@ -1,1 +1,1 @@
-"""Refresh income tax brackets tests — removed; functionality moved to pf-rates."""
+"""Refresh income tax bracket tests moved to pf-svc-reference."""

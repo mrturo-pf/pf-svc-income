@@ -110,7 +110,7 @@ rolled back at the end, and rows without a resolved `concept_code` are reported 
 `"mode": "commit"` once every row is resolved and the preview looks right; `commit`
 fails outright (400) if any row still has `concept_code: null`. See
 [the PDF import action plan](https://github.com/mrturo-pf/pf-improvements/blob/main/improvements/HIST-018-pdf-import/plan.md) for the full
-design/implementation history of this flow, including the pf-rates market-data caching
+design/implementation history of this flow, including the pf-svc-reference market-data caching
 caveat that applies to both modes.
 
 ## 2. Internal calculation services

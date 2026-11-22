@@ -102,7 +102,7 @@ def test_reference_data_endpoints_forward_include_inactive_query_param() -> None
 
 
 def test_currencies_and_income_tax_brackets_routes_no_longer_exist() -> None:
-    """Verify that routes removed in pf-rates migration return 404."""
+    """Verify that routes removed in pf-svc-reference migration return 404."""
     client = TestClient(app, headers={"X-API-Key": "test-key"})
     assert client.get("/reference-data/currencies").status_code == 404
     assert client.get("/reference-data/income-tax-brackets").status_code == 404

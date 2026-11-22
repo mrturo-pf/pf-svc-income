@@ -194,11 +194,11 @@ class FakeSession(FakeResultsQueueBase):
 
 
 class FakeMarketDataRepository:
-    """Test double for MarketDataRepository (the pf-rates-backed port).
+    """Test double for MarketDataRepository (the pf-svc-reference-backed port).
 
     Mirrors PfRatesClient's get_exchange_rate_value() shape exactly --
     predict_next_period_net_pay() no longer does any fallback logic of its
-    own (pf-rates owns the whole DB-hit -> provider -> nearest-prior-date
+    own (pf-svc-reference owns the whole DB-hit -> provider -> nearest-prior-date
     cascade server-side now), so this fake only ever needs a flat
     date -> value lookup, plus an optional simulated-outage mode.
     """
@@ -2364,7 +2364,9 @@ async def test_sqlalchemy_payroll_repository_infers_current_month_offset() -> No
 
 @pytest.mark.asyncio
 async def test_list_period_ranges_degrades_to_none_on_market_data_outage() -> None:
-    """A pf-rates outage must not 500 the whole endpoint -- just null that one field.
+    """A pf-svc-reference outage must not 500 the endpoint.
+
+    Just null that one field.
 
     See docs/proposals/net-pay-prediction-reimplementation-design-
     recommendation.md, Section 4: list_period_ranges() is the single
@@ -2374,7 +2376,7 @@ async def test_list_period_ranges_degrades_to_none_on_market_data_outage() -> No
     """
     _current_period, session = _build_current_period_fixture_session()
     market_data_repository = FakeMarketDataRepository(
-        raises=PayrollDependencyError("pf-rates is unreachable.")
+        raises=PayrollDependencyError("pf-svc-reference is unreachable.")
     )
     repository = SqlAlchemyPayrollRepository(  # type: ignore[arg-type]
         session, market_data_repository
@@ -2911,17 +2913,19 @@ async def test_predict_next_period_net_pay_returns_none_without_historical_uf() 
 
 @pytest.mark.asyncio
 async def test_predict_next_period_net_pay_propagates_dependency_error() -> None:
-    """A pf-rates outage must surface as PayrollDependencyError, not a silent None.
+    """A pf-svc-reference outage must surface as PayrollDependencyError.
+
+    Do not silently return None.
 
     list_period_ranges() is the one responsible for catching this at its own
     call-site boundary and degrading to None there -- this function itself
     must not swallow it, or that boundary would never see a real failure to
-    distinguish from "pf-rates genuinely has no UF value".
+    distinguish from "pf-svc-reference genuinely has no UF value".
     """
     current_period = build_june_2026_period()
     session = FakeSession([])
     market_data_repository = FakeMarketDataRepository(
-        raises=PayrollDependencyError("pf-rates is unreachable.")
+        raises=PayrollDependencyError("pf-svc-reference is unreachable.")
     )
 
     with pytest.raises(PayrollDependencyError):
@@ -2975,7 +2979,7 @@ async def test_predict_next_period_net_pay_calculates_correctly() -> None:
 
     Worked example from docs/proposals/net-pay-prediction-reimplementation-
     design-recommendation.md, Section 2 (recovered verbatim from the
-    pre-pf-rates implementation, commit bdc3d29).
+    pre-pf-svc-reference implementation, commit bdc3d29).
     """
     current_period = build_june_2026_period(worked_days=30)
     items = [
@@ -3479,8 +3483,8 @@ async def test_resolve_currency_equivalents_degrades_missing_currency_independen
 
 
 @pytest.mark.asyncio
-async def test_resolve_currency_equivalents_degrades_on_pf_rates_outage() -> None:
-    """pf-rates raising for every currency degrades all three to None.
+async def test_resolve_currency_equivalents_degrades_on_pf_reference_outage() -> None:
+    """pf-svc-reference raising for every currency degrades all three to None.
 
     resolve_currency_equivalents() never propagates -- unlike
     predict_next_period_net_pay()/project_future_months(), it is a 3-way
@@ -3491,7 +3495,7 @@ async def test_resolve_currency_equivalents_degrades_on_pf_rates_outage() -> Non
         Decimal("3001910"),
         rate_date=date(2026, 9, 1),
         market_data_repository=FakeMarketDataRepository(
-            raises=PayrollDependencyError("pf-rates unreachable")
+            raises=PayrollDependencyError("pf-svc-reference unreachable")
         ),
     )
 

@@ -13,7 +13,7 @@ from payroll.domain.taxes import IncomeTaxBracket
 from payroll.infrastructure.http.income_tax_bracket_client import IncomeTaxBracketClient
 
 
-BASE_URL = "http://pf-rates.test"
+BASE_URL = "http://pf-svc-reference.test"
 _BRACKET_JSON = {
     "valid_from": "2026-01-01",
     "valid_to": None,
@@ -63,7 +63,7 @@ async def test_get_income_tax_bracket_maps_response_to_domain_object() -> None:
 @pytest.mark.asyncio
 @respx.mock
 async def test_get_income_tax_bracket_returns_none_on_404() -> None:
-    """Returns None when pf-rates responds with 404."""
+    """Returns None when pf-svc-reference responds with 404."""
     respx.get(f"{BASE_URL}/income-tax-brackets").mock(return_value=httpx.Response(404))
     bracket = await _client().get_income_tax_bracket(date(2026, 4, 30), Decimal("20.5"))
     assert bracket is None
@@ -74,7 +74,9 @@ async def test_get_income_tax_bracket_returns_none_on_404() -> None:
 async def test_get_income_tax_bracket_raises_on_5xx() -> None:
     """Raises PayrollDependencyError on server errors."""
     respx.get(f"{BASE_URL}/income-tax-brackets").mock(return_value=httpx.Response(503))
-    with pytest.raises(PayrollDependencyError, match="pf-rates returned HTTP 503"):
+    with pytest.raises(
+        PayrollDependencyError, match="pf-svc-reference returned HTTP 503"
+    ):
         await _client().get_income_tax_bracket(date(2026, 4, 30), Decimal("20.5"))
 
 

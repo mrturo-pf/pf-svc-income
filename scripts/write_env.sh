@@ -18,11 +18,11 @@ CORPORATIVE_PROXY="${CORPORATIVE_PROXY:-}"
 
 {
   printf 'PAYROLL_ENV=%s\n' "$PAYROLL_ENV"
-  printf '# Database managed by pf-db (shared with pf-rates)\n'
+  printf '# Database managed by pf-db (shared with pf-svc-reference)\n'
   printf 'PF_DATABASE_URL=%s\n' "$PF_DATABASE_URL"
   printf 'PAYROLL_LOG_LEVEL=%s\n' "$PAYROLL_LOG_LEVEL"
   printf 'PF_REFERENCE_URL=%s\n' "$PF_REFERENCE_URL"
-  printf '# API key sent as X-API-Key header to pf-rates -- must match pf-rates own\n'
+  printf '# API key sent as X-API-Key header to pf-svc-reference -- must match pf-svc-reference own\n'
   printf '# PF_REFERENCE_API_KEY, which is always enforced (no no-auth mode).\n'
   printf 'PF_REFERENCE_API_KEY=%s\n' "$PF_REFERENCE_API_KEY"
   printf '\n# API key that clients must supply as X-API-Key header to access this service.\n'

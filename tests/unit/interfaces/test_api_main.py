@@ -78,10 +78,10 @@ async def test_payroll_error_handler_returns_status_code_and_detail() -> None:
     """PayrollError is serialized to {detail: str} JSON with the error's status code."""
     from payroll.application.errors import PayrollDependencyError
 
-    exc = PayrollDependencyError("pf-rates unreachable: missing protocol")
+    exc = PayrollDependencyError("pf-svc-reference unreachable: missing protocol")
     response = await main.payroll_error_handler(SimpleNamespace(), exc)  # type: ignore[arg-type]
 
     assert response.status_code == 502
     assert json.loads(response.body) == {
-        "detail": "pf-rates unreachable: missing protocol"
+        "detail": "pf-svc-reference unreachable: missing protocol"
     }

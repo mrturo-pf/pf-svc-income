@@ -1,1 +1,1 @@
-"""Sync market data tests — removed; functionality moved to pf-rates."""
+"""Sync market data tests — removed; functionality moved to pf-svc-reference."""
