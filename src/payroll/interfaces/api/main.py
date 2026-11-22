@@ -19,6 +19,10 @@ from payroll.interfaces.api.routes.payroll_export import (
 )
 from payroll.interfaces.api.routes.pdf_templates import router as pdf_templates_router
 from payroll.interfaces.api.routes.reference_data import router as reference_data_router
+from payroll.interfaces.api.request_correlation import (
+    install_request_correlation_middleware,
+    install_request_correlation_openapi,
+)
 from payroll.interfaces.api.security import verify_api_key
 
 
@@ -29,6 +33,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Payroll API", lifespan=lifespan)
+install_request_correlation_middleware(app)
+install_request_correlation_openapi(app)
 app.include_router(health_router)
 # payroll_export_router's and pdf_templates_router's static "/payroll/spreadsheet",
 # "/payroll/spreadsheet/template", and "/payroll/templates" paths must be registered
