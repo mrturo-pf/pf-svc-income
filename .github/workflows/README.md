@@ -66,7 +66,7 @@ full one-time `gcloud` setup script.
 Secret Manager secrets are injected automatically by the reusable deploy workflow —
 they are not GitHub secrets. Besides `PF_DATABASE_URL` and `PF_INCOME_API_KEY`,
 pf-svc-income's deploy step also injects `PF_REFERENCE_API_KEY`, since this service calls
-pf-rates over HTTP for financial reference data.
+pf-svc-reference over HTTP for financial reference data.
 
 ## Deployment approval
 
