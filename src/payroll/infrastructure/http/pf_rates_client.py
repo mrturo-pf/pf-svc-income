@@ -42,7 +42,7 @@ class PfRatesClient(PfRatesClientBase):
         result = await pf_reference_get(
             f"{self._base_url}/exchange-rates/value",
             {"currency_code": currency_code, "rate_date": normalized_date.isoformat()},
-            self._request_headers(),
+            await self._request_headers(),
             label="exchange rate",
         )
         value = Decimal(str(result["value_clp"])) if result is not None else None
@@ -77,7 +77,7 @@ class PfRatesClient(PfRatesClientBase):
                         for code, rate_date in missing
                     ]
                 },
-                self._request_headers(),
+                await self._request_headers(),
                 label="exchange rate batch",
             )
             results = cast(list[dict[str, object]], result["results"] if result else [])
@@ -122,7 +122,7 @@ class PfRatesClient(PfRatesClientBase):
                         for code, year, month in missing
                     ]
                 },
-                self._request_headers(),
+                await self._request_headers(),
                 label="economic index batch",
             )
             results = cast(list[dict[str, object]], result["results"] if result else [])
@@ -152,7 +152,7 @@ class PfRatesClient(PfRatesClientBase):
         result = await pf_reference_get(
             f"{self._base_url}/economic-indices/value",
             {"code": code, "year": period_year, "month": period_month},
-            self._request_headers(),
+            await self._request_headers(),
             label="economic index",
         )
         value = Decimal(str(result["index_value"])) if result is not None else None
@@ -175,7 +175,7 @@ class PfRatesClient(PfRatesClientBase):
         results = await pf_reference_get_list(
             f"{self._base_url}/economic-indices",
             {"code": code},
-            self._request_headers(),
+            await self._request_headers(),
             label="latest economic index",
         )
         value: tuple[date, Decimal] | None = None

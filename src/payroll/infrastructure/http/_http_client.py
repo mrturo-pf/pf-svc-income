@@ -8,6 +8,8 @@ from collections.abc import Callable
 
 import httpx
 import structlog
+from google.auth.transport.requests import Request as GoogleAuthRequest  # type: ignore[import-not-found]
+from google.oauth2 import id_token  # type: ignore[import-not-found]
 
 from payroll.application.errors import PayrollDependencyError
 from payroll.infrastructure.http._ttl_cache import TTLCache
@@ -60,11 +62,15 @@ class PfRatesClientBase:
         self._api_key = api_key
         self._cache = TTLCache(cache_ttl_seconds, clock)
 
-    def _request_headers(self) -> dict[str, str]:
-        """Build per-call headers with one ID reused across retries."""
+    async def _request_headers(self) -> dict[str, str]:
+        """Build per-call headers with one ID and backend identity token."""
+        identity_token = await asyncio.to_thread(
+            id_token.fetch_id_token, GoogleAuthRequest(), self._base_url
+        )
         return {
             "X-API-Key": self._api_key,
             request_id_header_name(): get_or_create_request_id(),
+            "Authorization": f"Bearer {identity_token}",
         }
 
 
