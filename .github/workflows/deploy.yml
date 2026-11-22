@@ -70,7 +70,7 @@
 #     --member="serviceAccount:${SA}" \
 #     --role="roles/secretmanager.secretAccessor"
 #
-#   # 9. Grant pf-svc-income access to PF_REFERENCE_API_KEY (to call pf-rates service)
+#   # 9. Grant pf-svc-income access to PF_REFERENCE_API_KEY (to call pf-svc-reference service)
 #   #    NOTE: This secret was already created during pf-rates setup.
 #   #    We only need to grant this service account access to read it.
 #   gcloud secrets add-iam-policy-binding PF_REFERENCE_API_KEY \
@@ -93,7 +93,7 @@
 # but the reusable workflow never actually read it -- a real bug that shipped
 # undetected because /health, the only thing the deploy smoke-test checks,
 # doesn't call pf-rates). It's resolved dynamically at deploy time via
-# 'gcloud run services describe pf-rates' and injected as a plain env var --
+# 'gcloud run services describe pf-svc-reference' and injected as a plain env var --
 # see the "Deploy to Cloud Run" step in deploy-reusable.yml.
 #
 # Secret Manager Secrets (auto-injected by reusable workflow):
@@ -131,7 +131,7 @@ jobs:
       database_secret_name: PF_DATABASE_URL
       workload_identity_provider: projects/646185261155/locations/global/workloadIdentityPools/github-actions/providers/github-actions-oidc
       deployer_service_account: pf-svc-income-deployer@coreassistant-474022.iam.gserviceaccount.com
-      dependency_service_name: pf-rates
+      dependency_service_name: pf-svc-reference
       dependency_env_name: PF_REFERENCE_URL
       protected_smoke_path: /payroll/employers
       protected_smoke_secret_name: PF_INCOME_API_KEY
