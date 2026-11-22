@@ -16,6 +16,15 @@ import pytest
 from payroll.application.dto import PayrollPeriodDetailDTO, PayrollSummaryDTO
 
 
+@pytest.fixture(autouse=True)
+def mock_google_identity_token(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Use a deterministic identity token in tests instead of ADC."""
+    monkeypatch.setattr(
+        "google.oauth2.id_token.fetch_id_token",
+        lambda _request, audience: f"token-for:{audience}",
+    )
+
+
 @pytest.fixture
 def payroll_summary_dto() -> PayrollSummaryDTO:
     """Create a standard PayrollSummaryDTO for testing."""

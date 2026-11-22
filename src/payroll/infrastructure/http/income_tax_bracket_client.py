@@ -34,7 +34,7 @@ class IncomeTaxBracketClient(PfRatesClientBase):
                 "reference_date": payment_date.isoformat(),
                 "taxable_base_utm": str(taxable_base_utm),
             },
-            self._request_headers(),
+            await self._request_headers(),
             label="income tax bracket",
         )
         if data is None:
