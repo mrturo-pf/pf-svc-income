@@ -64,14 +64,16 @@ class PfRatesClientBase:
 
     async def _request_headers(self) -> dict[str, str]:
         """Build per-call headers with one ID and backend identity token."""
-        identity_token = await asyncio.to_thread(
-            id_token.fetch_id_token, GoogleAuthRequest(), self._base_url
-        )
-        return {
+        headers = {
             "X-API-Key": self._api_key,
             request_id_header_name(): get_or_create_request_id(),
-            "Authorization": f"Bearer {identity_token}",
         }
+        if ".gateway.dev" not in self._base_url:
+            identity_token = await asyncio.to_thread(
+                id_token.fetch_id_token, GoogleAuthRequest(), self._base_url
+            )
+            headers["Authorization"] = f"Bearer {identity_token}"
+        return headers
 
 
 async def _pf_reference_request(
