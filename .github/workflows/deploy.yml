@@ -71,7 +71,7 @@
 #     --role="roles/secretmanager.secretAccessor"
 #
 #   # 9. Grant pf-svc-income access to PF_REFERENCE_API_KEY (to call pf-svc-reference service)
-#   #    NOTE: This secret was already created during pf-rates setup.
+#   #    NOTE: This secret was already created during pf-svc-reference setup.
 #   #    We only need to grant this service account access to read it.
 #   gcloud secrets add-iam-policy-binding PF_REFERENCE_API_KEY \
 #     --member="serviceAccount:${SA}" \
@@ -92,13 +92,13 @@
 # NOTE: PF_REFERENCE_URL is NOT a GitHub secret (it used to be listed as one here,
 # but the reusable workflow never actually read it -- a real bug that shipped
 # undetected because /health, the only thing the deploy smoke-test checks,
-# doesn't call pf-rates). It's resolved dynamically at deploy time via
+# doesn't call pf-svc-reference). It's resolved dynamically at deploy time via
 # 'gcloud run services describe pf-svc-reference' and injected as a plain env var --
 # see the "Deploy to Cloud Run" step in deploy-reusable.yml.
 #
 # Secret Manager Secrets (auto-injected by reusable workflow):
 #   PF_DATABASE_URL      — Database connection string
-#   PF_REFERENCE_API_KEY                — API key for calling pf-rates service
+#   PF_REFERENCE_API_KEY                — API key for calling pf-svc-reference
 #   PF_INCOME_API_KEY              — API key for this service
 #
 # Deployment runs automatically after a pull request is merged into protected `main`.
