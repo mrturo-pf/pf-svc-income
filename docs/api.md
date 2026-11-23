@@ -37,8 +37,9 @@ This section is the **complete inventory of HTTP endpoints** currently exposed b
 
 pf-svc-income does **not** expose its own market-data endpoints. Exchange rates, economic
 indices, and income tax brackets are fetched read-only from **pf-svc-reference** over HTTP
-through `MarketDataRepository` (configured via `PF_REFERENCE_URL` / `PF_REFERENCE_API_KEY`,
-see [Getting Started](getting-started.md)). pf-svc-reference itself owns the default-provider
+through `MarketDataRepository` (configured via the direct `PF_REFERENCE_URL`; Cloud Run
+uses a Google identity token and no client API key, while local execution uses the
+loopback URL). pf-svc-reference itself owns the default-provider
 behavior (SII lookups for `UTM`/`IPC_CL`, `mindicador` fallback for `UF`/`USD`/`EUR`,
 optional BCCh credentials) and the startup background sync — see
 [pf-svc-reference' API Reference](https://github.com/mrturo-pf/pf-svc-reference/blob/main/docs/api.md) for `GET /exchange-rates`,
