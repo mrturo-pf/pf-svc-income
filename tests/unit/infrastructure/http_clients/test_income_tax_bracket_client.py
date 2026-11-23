@@ -43,7 +43,7 @@ def _client(
         return IncomeTaxBracketClient(
             BASE_URL, "test-key", ttl, clock=lambda: next(values)
         )
-    return IncomeTaxBracketClient(BASE_URL, "test-key", ttl)
+    return IncomeTaxBracketClient(BASE_URL, ttl)
 
 
 @pytest.mark.asyncio

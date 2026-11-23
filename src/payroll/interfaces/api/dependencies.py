@@ -95,7 +95,6 @@ def get_market_data_repository() -> MarketDataRepository:
     """Get market data repository (HTTP adapter backed by pf-svc-reference)."""
     return PfRatesClient(
         base_url=settings.pf_reference_base_url,
-        api_key=settings.pf_reference_api_key,
         cache_ttl_seconds=settings.pf_reference_cache_ttl_seconds,
     )
 
@@ -104,7 +103,6 @@ def get_income_tax_bracket_client() -> IncomeTaxBracketPort:
     """Get income tax bracket client (HTTP adapter backed by pf-svc-reference)."""
     return IncomeTaxBracketClient(
         base_url=settings.pf_reference_base_url,
-        api_key=settings.pf_reference_api_key,
         cache_ttl_seconds=settings.pf_reference_cache_ttl_seconds,
     )
 

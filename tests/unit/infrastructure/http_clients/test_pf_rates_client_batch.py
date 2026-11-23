@@ -15,7 +15,7 @@ BASE_URL = "http://pf-svc-reference.test"
 
 def _client() -> PfRatesClient:
     """Build a test client."""
-    return PfRatesClient(BASE_URL, "test-key")
+    return PfRatesClient(BASE_URL)
 
 
 @pytest.mark.asyncio

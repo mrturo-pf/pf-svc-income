@@ -2,7 +2,7 @@
 
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -23,7 +23,6 @@ from payroll.interfaces.api.request_correlation import (
     install_request_correlation_middleware,
     install_request_correlation_openapi,
 )
-from payroll.interfaces.api.security import verify_api_key
 
 
 @asynccontextmanager
@@ -43,11 +42,11 @@ app.include_router(health_router)
 # matches any string, "spreadsheet"/"templates" included. Swapping this order would
 # make GET /payroll/templates 422 on int("templates") instead of ever reaching the
 # template-management routes.
-app.include_router(payroll_export_router, dependencies=[Depends(verify_api_key)])
-app.include_router(pdf_templates_router, dependencies=[Depends(verify_api_key)])
-app.include_router(employers_contracts_router, dependencies=[Depends(verify_api_key)])
-app.include_router(payroll_router, dependencies=[Depends(verify_api_key)])
-app.include_router(reference_data_router, dependencies=[Depends(verify_api_key)])
+app.include_router(payroll_export_router)
+app.include_router(pdf_templates_router)
+app.include_router(employers_contracts_router)
+app.include_router(payroll_router)
+app.include_router(reference_data_router)
 
 
 @app.exception_handler(RequestValidationError)

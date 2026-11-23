@@ -117,7 +117,7 @@ async def test_compute_contributions_fetches_uf_from_pf_reference() -> None:
     )
 
     repository = StubPayrollRepository()
-    client = PfRatesClient(_PF_REFERENCE_BASE, "test-key", cache_ttl_seconds=60)
+    client = PfRatesClient(_PF_REFERENCE_BASE, cache_ttl_seconds=60)
     service = ContributionComputationService(repository, client)
 
     result = await service.compute(

@@ -32,8 +32,8 @@ def _client(ttl: int = 300, clock_values: list[float] | None = None) -> PfRatesC
     """Build a PfRatesClient with an optional deterministic clock."""
     if clock_values is not None:
         values = iter(clock_values)
-        return PfRatesClient(BASE_URL, "test-key", ttl, clock=lambda: next(values))
-    return PfRatesClient(BASE_URL, "test-key", ttl)
+        return PfRatesClient(BASE_URL, ttl, clock=lambda: next(values))
+    return PfRatesClient(BASE_URL, ttl)
 
 
 def _economic_index_item(
