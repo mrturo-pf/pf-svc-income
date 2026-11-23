@@ -40,9 +40,7 @@ def _client(
     """Build a client with an optional deterministic clock."""
     if clock_values is not None:
         values = iter(clock_values)
-        return IncomeTaxBracketClient(
-            BASE_URL, "test-key", ttl, clock=lambda: next(values)
-        )
+        return IncomeTaxBracketClient(BASE_URL, ttl, clock=lambda: next(values))
     return IncomeTaxBracketClient(BASE_URL, ttl)
 
 
