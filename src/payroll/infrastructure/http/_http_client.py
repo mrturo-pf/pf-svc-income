@@ -46,7 +46,6 @@ class PfRatesClientBase:
     def __init__(
         self,
         base_url: str,
-        api_key: str,
         cache_ttl_seconds: int = 300,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
@@ -54,20 +53,15 @@ class PfRatesClientBase:
 
         Args:
             base_url: Base URL of the pf-svc-reference service (no trailing slash).
-            api_key: Value for the X-API-Key authentication header.
             cache_ttl_seconds: How long to cache responses in seconds.
             clock: Injectable monotonic clock for testing TTL expiry.
         """
         self._base_url = base_url.rstrip("/")
-        self._api_key = api_key
         self._cache = TTLCache(cache_ttl_seconds, clock)
 
     async def _request_headers(self) -> dict[str, str]:
         """Build per-call headers with one ID and backend identity token."""
-        headers = {
-            "X-API-Key": self._api_key,
-            request_id_header_name(): get_or_create_request_id(),
-        }
+        headers = {request_id_header_name(): get_or_create_request_id()}
         if ".gateway.dev" not in self._base_url:
             identity_token = await asyncio.to_thread(
                 id_token.fetch_id_token, GoogleAuthRequest(), self._base_url

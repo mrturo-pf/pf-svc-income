@@ -33,10 +33,9 @@ async def test_outbound_headers_use_current_request_id() -> None:
     structlog.contextvars.clear_contextvars()
     structlog.contextvars.bind_contextvars(request_id=_VALID_ID)
     try:
-        client = PfRatesClientBase("https://reference.test", "api-key")
+        client = PfRatesClientBase("https://reference.test")
 
         assert await client._request_headers() == {
-            "X-API-Key": "api-key",
             "X-Request-ID": _VALID_ID,
             "Authorization": "Bearer token-for:https://reference.test",
         }
@@ -59,7 +58,7 @@ async def test_retry_reuses_one_request_id(monkeypatch: pytest.MonkeyPatch) -> N
     structlog.contextvars.clear_contextvars()
     structlog.contextvars.bind_contextvars(request_id=_VALID_ID)
     try:
-        client = PfRatesClientBase(_BASE_URL, "api-key")
+        client = PfRatesClientBase(_BASE_URL)
         headers = await client._request_headers()
         response = await _pf_reference_request(
             f"{_BASE_URL}/health", None, headers, label="health"
@@ -83,9 +82,7 @@ async def test_outbound_context_generates_one_id_for_repeated_attempts() -> None
         second = get_or_create_request_id()
 
         assert first == second
-        headers = await PfRatesClientBase(
-            "https://reference.test", "api-key"
-        )._request_headers()
+        headers = await PfRatesClientBase("https://reference.test")._request_headers()
         assert headers["X-Request-ID"] == first
     finally:
         structlog.contextvars.clear_contextvars()

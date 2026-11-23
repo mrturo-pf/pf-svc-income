@@ -7,21 +7,20 @@ from payroll.infrastructure.http._http_client import PfRatesClientBase
 
 
 @pytest.mark.asyncio
-async def test_gateway_reference_url_uses_application_headers_only() -> None:
-    """Gateway calls preserve app auth and correlation without direct ADC tokens."""
+async def test_reference_service_url_uses_identity_token_without_client_key() -> None:
+    """Backend calls use identity tokens and never require a client API key."""
     structlog.contextvars.clear_contextvars()
     structlog.contextvars.bind_contextvars(
         request_id="550e8400-e29b-41d4-a716-446655440000"
     )
     try:
         headers = await PfRatesClientBase(
-            "https://pf-backend-gateway-poc-88uq0qjn.uc.gateway.dev/reference",
-            "api-key",
+            "https://pf-svc-reference-yqd4p7fzaa-uc.a.run.app"
         )._request_headers()
 
         assert headers == {
-            "X-API-Key": "api-key",
             "X-Request-ID": "550e8400-e29b-41d4-a716-446655440000",
+            "Authorization": "Bearer token-for:https://pf-svc-reference-yqd4p7fzaa-uc.a.run.app",
         }
     finally:
         structlog.contextvars.clear_contextvars()

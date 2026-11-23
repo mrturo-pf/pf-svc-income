@@ -1,36 +1,28 @@
-"""Integration tests verifying that API key auth is wired to protected routes.
-
-These tests exercise the router-level Depends(verify_api_key) wiring in main.py,
-NOT just the verify_api_key function in isolation.  If the dependency were removed
-from include_router(), the unit tests in test_security.py would still pass while
-these tests would correctly fail.
-"""
+"""Integration tests for the local authentication boundary."""
 
 from fastapi.testclient import TestClient
 
 from payroll.interfaces.api.main import app
 
 
-def test_protected_route_returns_403_when_key_is_missing() -> None:
-    """A request to a protected route with no X-API-Key header returns 403."""
+def test_business_route_does_not_require_client_api_key() -> None:
+    """Local direct requests are not rejected for missing client API keys."""
     client = TestClient(app, raise_server_exceptions=False)
     response = client.get("/payroll")
-    assert response.status_code == 403
-    assert response.json() == {"detail": "Invalid or missing API key."}
+    assert response.status_code != 403
 
 
-def test_protected_route_returns_403_when_key_is_wrong() -> None:
-    """A request to a protected route with an incorrect X-API-Key returns 403."""
+def test_business_route_ignores_legacy_client_api_key() -> None:
+    """The service does not validate legacy client API-key values."""
     client = TestClient(
-        app, headers={"X-API-Key": "wrong-key"}, raise_server_exceptions=False
+        app, headers={"X-API-Key": "legacy-value"}, raise_server_exceptions=False
     )
     response = client.get("/reference-data/pension-institutions")
-    assert response.status_code == 403
-    assert response.json() == {"detail": "Invalid or missing API key."}
+    assert response.status_code != 403
 
 
 def test_health_returns_200_without_any_key() -> None:
-    """/health is public: no X-API-Key header required."""
+    """/health is public: no client API key is required."""
     client = TestClient(app)
     response = client.get("/health")
     assert response.status_code == 200
