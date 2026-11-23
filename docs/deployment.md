@@ -64,9 +64,10 @@ The current GCP facade is:
 https://pf-backend-gateway-poc-88uq0qjn.uc.gateway.dev/income/*
 ```
 
-It routes through `pf-gateway-proxy` and preserves application `X-API-Key` and
-`X-Request-ID`. The direct Cloud Run URL remains available as the rollback path; direct
-URL enforcement is not enabled.
+Public clients enter through the gateway with the gateway-owned `X-API-Key` and
+`X-Request-ID`. Income-to-reference calls do not traverse the public gateway: the
+runtime uses the direct reference Cloud Run URL and a Google identity token. Direct
+Cloud Run URLs remain IAM-protected rollback/diagnostic paths.
 
 ## Request correlation
 
@@ -155,10 +156,10 @@ Configure the following secrets in the repository (Settings → Secrets and vari
 | `MAIL_TO` |  | Recipient address(es), comma-separated |
 
 > **pf-svc-reference connectivity is automatic.** `PF_REFERENCE_URL` is not a secret you
-> configure -- the deploy pipeline resolves pf-svc-reference' live Cloud Run URL at
-> deploy time (`gcloud run services describe pf-svc-reference`) and injects it as a
-> plain env var. `PF_REFERENCE_API_KEY` (the credential half) still comes from
-> Secret Manager, same as `PF_DATABASE_URL`.
+> configure -- the deploy pipeline injects the direct pf-svc-reference Cloud Run URL as
+> a plain env var. The runtime authenticates that backend call with a Google identity
+> token; no client API key is sent to reference. Legacy API-key secrets are rollback
+> artifacts only and are not part of the active runtime contract.
 
 ### Database options
 
