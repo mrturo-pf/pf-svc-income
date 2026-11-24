@@ -1,4 +1,4 @@
-"""Integration test: ContributionComputationService → PfRatesClient → respx."""
+"""Integration test: ContributionComputationService → PfSvcReferenceClient → respx."""
 
 from datetime import date
 from decimal import Decimal
@@ -23,9 +23,9 @@ from payroll.domain.contributions import (
     PensionInstitution,
     PensionPlan,
 )
-from payroll.infrastructure.http.pf_rates_client import PfRatesClient
+from payroll.infrastructure.http.pf_svc_reference_client import PfSvcReferenceClient
 
-_PF_REFERENCE_BASE = "http://pf-svc-reference.integration-test"
+_PF_SVC_REFERENCE_BASE = "http://pf-svc-reference.integration-test"
 
 
 class StubPayrollRepository:
@@ -98,7 +98,7 @@ class StubPayrollRepository:
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_compute_contributions_fetches_uf_from_pf_reference() -> None:
+async def test_compute_contributions_fetches_uf_from_pf_svc_reference() -> None:
     """Compute contributions retrieves UF from pf-svc-reference.
 
     Produces correct amounts for the contribution scenario.
@@ -110,18 +110,18 @@ async def test_compute_contributions_fetches_uf_from_pf_reference() -> None:
     - caps = 90.0 UF (income is below cap, so no capping applies)
 
     uf_value_clp is omitted from the command so the use case must call
-    PfRatesClient.get_exchange_rate_value.
+    PfSvcReferenceClient.get_exchange_rate_value.
     """
-    uf_route = respx.get(f"{_PF_REFERENCE_BASE}/exchange-rates/value").mock(
+    uf_route = respx.get(f"{_PF_SVC_REFERENCE_BASE}/exchange-rates/value").mock(
         return_value=httpx.Response(200, json={"value_clp": "40000.00"})
     )
 
     repository = StubPayrollRepository()
-    client = PfRatesClient(_PF_REFERENCE_BASE, cache_ttl_seconds=60)
+    client = PfSvcReferenceClient(_PF_SVC_REFERENCE_BASE, cache_ttl_seconds=60)
     service = ContributionComputationService(repository, client)
 
     result = await service.compute(
-        # No uf_value_clp: service must call PfRatesClient
+        # No uf_value_clp: service must call PfSvcReferenceClient
         ComputeContributionsCommandDTO(period_id=1, pension_plan_id=1, health_plan_id=2)
     )
 

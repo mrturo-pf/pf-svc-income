@@ -14,8 +14,10 @@ class Settings(BaseSettings):
     )
     api_base_url: str = "http://127.0.0.1:8000"
     log_level: str = "INFO"
-    pf_reference_base_url: str = Field(default="", validation_alias="PF_REFERENCE_URL")
-    pf_reference_cache_ttl_seconds: int = 300
+    pf_svc_reference_base_url: str = Field(
+        default="", validation_alias="PF_SVC_REFERENCE_URL"
+    )
+    pf_svc_reference_cache_ttl_seconds: int = 300
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -155,7 +155,7 @@ Configure the following secrets in the repository (Settings → Secrets and vari
 | `MAIL_FROM` |  | Sender display address (e.g., `pf-svc-income CI <you@gmail.com>`) |
 | `MAIL_TO` |  | Recipient address(es), comma-separated |
 
-> **pf-svc-reference connectivity is automatic.** `PF_REFERENCE_URL` is not a secret you
+> **pf-svc-reference connectivity is automatic.** `PF_SVC_REFERENCE_URL` is not a secret you
 > configure -- the deploy pipeline injects the direct pf-svc-reference Cloud Run URL as
 > a plain env var. The runtime authenticates that backend call with a Google identity
 > token; no client API key is sent to reference. Legacy API-key secrets are rollback

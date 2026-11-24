@@ -62,18 +62,18 @@
 #   #      CMD ["uvicorn", "financial_data.interfaces.api.app:app", \
 #   #           "--host", "0.0.0.0", "--port", "8080"]
 #
-#   # 8. Create the PF_INCOME_API_KEY secret (API key clients must supply to call this service)
+#   # 8. Create the PF_SVC_INCOME_API_KEY secret (API key clients must supply to call this service)
 #   echo -n "<STRONG_RANDOM_KEY>" | \
-#     gcloud secrets create PF_INCOME_API_KEY --data-file=-
+#     gcloud secrets create PF_SVC_INCOME_API_KEY --data-file=-
 #
-#   gcloud secrets add-iam-policy-binding PF_INCOME_API_KEY \
+#   gcloud secrets add-iam-policy-binding PF_SVC_INCOME_API_KEY \
 #     --member="serviceAccount:${SA}" \
 #     --role="roles/secretmanager.secretAccessor"
 #
-#   # 9. Grant pf-svc-income access to PF_REFERENCE_API_KEY (to call pf-svc-reference service)
+#   # 9. Grant pf-svc-income access to PF_SVC_REFERENCE_API_KEY (to call pf-svc-reference service)
 #   #    NOTE: This secret was already created during pf-svc-reference setup.
 #   #    We only need to grant this service account access to read it.
-#   gcloud secrets add-iam-policy-binding PF_REFERENCE_API_KEY \
+#   gcloud secrets add-iam-policy-binding PF_SVC_REFERENCE_API_KEY \
 #     --member="serviceAccount:${SA}" \
 #     --role="roles/secretmanager.secretAccessor"
 #
@@ -89,15 +89,15 @@
 #   MAIL_FROM                       — Sender address (e.g. you@example.com)
 #   MAIL_TO                         — Recipient address(es), comma-separated
 #
-# NOTE: PF_REFERENCE_URL is NOT a GitHub secret. It is injected as the direct
+# NOTE: PF_SVC_REFERENCE_URL is NOT a GitHub secret. It is injected as the direct
 # Cloud Run URL so income calls reference with a Google identity token and does
 # not traverse the public API Gateway. The deploy smoke test must exercise a
 # route that reaches reference, not only /health.
 #
 # Secret Manager Secrets (auto-injected by reusable workflow):
 #   PF_DATABASE_URL      — Database connection string
-#   PF_REFERENCE_API_KEY                — legacy rollback secret; not used by the runtime
-#   PF_INCOME_API_KEY              — legacy rollback secret; not used by the runtime
+#   PF_SVC_REFERENCE_API_KEY                — legacy rollback secret; not used by the runtime
+#   PF_SVC_INCOME_API_KEY              — legacy rollback secret; not used by the runtime
 #
 # Deployment runs automatically after a pull request is merged into protected `main`.
 #
@@ -131,7 +131,9 @@ jobs:
       deployer_service_account: pf-svc-income-deployer@coreassistant-474022.iam.gserviceaccount.com
       dependency_service_name: ''
       dependency_url: https://pf-svc-reference-yqd4p7fzaa-uc.a.run.app
-      dependency_env_name: PF_REFERENCE_URL
+      dependency_env_name: PF_SVC_REFERENCE_URL
       protected_smoke_path: /payroll/employers
-      protected_smoke_secret_name: PF_INCOME_API_KEY
+      protected_smoke_secret_name: PF_SVC_INCOME_API_KEY
+      smoke_url: https://pf-backend-gateway-poc-88uq0qjn.uc.gateway.dev/income/health
+      smoke_requires_auth: false
     secrets: inherit
