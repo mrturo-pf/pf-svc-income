@@ -1,6 +1,5 @@
-"""Tests for PfRatesClient."""
+"""Tests for PfSvcReferenceClient."""
 
-import asyncio
 from datetime import date
 from decimal import Decimal
 
@@ -9,8 +8,8 @@ import respx
 import httpx
 
 from payroll.application.errors import PayrollDependencyError
-from payroll.infrastructure.http.pf_rates_client import (
-    PfRatesClient,
+from payroll.infrastructure.http.pf_svc_reference_client import (
+    PfSvcReferenceClient,
     _normalize_exchange_rate_date,
 )
 
@@ -18,22 +17,14 @@ from payroll.infrastructure.http.pf_rates_client import (
 BASE_URL = "http://pf-svc-reference.test"
 
 
-@pytest.fixture(autouse=True)
-def _instant_backoff(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Skip the real retry backoff delay so retry tests run instantly."""
-
-    async def _no_sleep(_seconds: float) -> None:
-        return None
-
-    monkeypatch.setattr(asyncio, "sleep", _no_sleep)
-
-
-def _client(ttl: int = 300, clock_values: list[float] | None = None) -> PfRatesClient:
-    """Build a PfRatesClient with an optional deterministic clock."""
+def _client(
+    ttl: int = 300, clock_values: list[float] | None = None
+) -> PfSvcReferenceClient:
+    """Build a PfSvcReferenceClient with an optional deterministic clock."""
     if clock_values is not None:
         values = iter(clock_values)
-        return PfRatesClient(BASE_URL, ttl, clock=lambda: next(values))
-    return PfRatesClient(BASE_URL, ttl)
+        return PfSvcReferenceClient(BASE_URL, ttl, clock=lambda: next(values))
+    return PfSvcReferenceClient(BASE_URL, ttl)
 
 
 def _economic_index_item(

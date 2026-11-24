@@ -1,6 +1,5 @@
 """Tests for IncomeTaxBracketClient."""
 
-import asyncio
 from datetime import date
 from decimal import Decimal
 
@@ -22,16 +21,6 @@ _BRACKET_JSON = {
     "marginal_rate": "0.040000",
     "rebate_utm": "0.5400",
 }
-
-
-@pytest.fixture(autouse=True)
-def _instant_backoff(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Skip the real retry backoff delay so retry tests run instantly."""
-
-    async def _no_sleep(_seconds: float) -> None:
-        return None
-
-    monkeypatch.setattr(asyncio, "sleep", _no_sleep)
 
 
 def _client(

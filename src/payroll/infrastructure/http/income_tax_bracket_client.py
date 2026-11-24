@@ -6,10 +6,13 @@ from datetime import date
 from decimal import Decimal
 
 from payroll.domain.taxes import IncomeTaxBracket
-from payroll.infrastructure.http._http_client import PfRatesClientBase, pf_reference_get
+from payroll.infrastructure.http._http_client import (
+    PfSvcReferenceClientBase,
+    pf_svc_reference_get,
+)
 
 
-class IncomeTaxBracketClient(PfRatesClientBase):
+class IncomeTaxBracketClient(PfSvcReferenceClientBase):
     """HTTP adapter implementing IncomeTaxBracketPort via pf-svc-reference REST API."""
 
     async def get_income_tax_bracket(
@@ -28,7 +31,7 @@ class IncomeTaxBracketClient(PfRatesClientBase):
         if hit:
             return cached  # type: ignore[return-value]
 
-        data = await pf_reference_get(
+        data = await pf_svc_reference_get(
             f"{self._base_url}/income-tax-brackets",
             {
                 "reference_date": payment_date.isoformat(),

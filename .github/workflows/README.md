@@ -36,7 +36,7 @@ Cloud Run Job before this service receives traffic.
 **Calls:** `pf-common/.github/workflows/gcp-setup-reusable.yml`.
 
 Creates the Artifact Registry repository and placeholder Secret Manager secrets
-(`PF_DATABASE_URL`, `PF_INCOME_API_KEY`). Run this once before the very first deploy;
+(`PF_DATABASE_URL`, `PF_SVC_INCOME_API_KEY`). Run this once before the very first deploy;
 see the full manual setup checklist in the header comment of `deploy.yml`.
 
 ### `debug.yml` — Debug CI (manual)
@@ -64,8 +64,8 @@ full one-time `gcloud` setup script.
 | `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM`, `MAIL_TO` | SMTP config for the Notify jobs |
 
 Secret Manager secrets are injected automatically by the reusable deploy workflow —
-they are not GitHub secrets. Besides `PF_DATABASE_URL` and `PF_INCOME_API_KEY`,
-pf-svc-income's deploy step also injects `PF_REFERENCE_API_KEY`, since this service calls
+they are not GitHub secrets. Besides `PF_DATABASE_URL` and `PF_SVC_INCOME_API_KEY`,
+pf-svc-income's deploy step also injects `PF_SVC_REFERENCE_API_KEY`, since this service calls
 pf-svc-reference over HTTP for financial reference data.
 
 ## Deployment approval

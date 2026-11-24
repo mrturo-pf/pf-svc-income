@@ -17,7 +17,7 @@ from payroll.application.ports.template_repository import (
     TemplateReader,
     TemplateRepository,
 )
-from payroll.infrastructure.http.pf_rates_client import PfRatesClient
+from payroll.infrastructure.http.pf_svc_reference_client import PfSvcReferenceClient
 from payroll.infrastructure.http.income_tax_bracket_client import IncomeTaxBracketClient
 from payroll.infrastructure.exporters.spreadsheet_exporter import (
     get_exporter_for_format,
@@ -82,7 +82,7 @@ def get_payroll_repository(
 ) -> PayrollRepository:
     """Get payroll repository.
 
-    Wires in a real MarketDataRepository (PfRatesClient) so
+    Wires in a real MarketDataRepository (PfSvcReferenceClient) so
     list_period_ranges() can predict the first future period's net_pay_clp
     via pf-svc-reference-backed UF values; every other PayrollRepository consumer
     simply never reads it. See docs/proposals/net-pay-prediction-
@@ -93,17 +93,17 @@ def get_payroll_repository(
 
 def get_market_data_repository() -> MarketDataRepository:
     """Get market data repository (HTTP adapter backed by pf-svc-reference)."""
-    return PfRatesClient(
-        base_url=settings.pf_reference_base_url,
-        cache_ttl_seconds=settings.pf_reference_cache_ttl_seconds,
+    return PfSvcReferenceClient(
+        base_url=settings.pf_svc_reference_base_url,
+        cache_ttl_seconds=settings.pf_svc_reference_cache_ttl_seconds,
     )
 
 
 def get_income_tax_bracket_client() -> IncomeTaxBracketPort:
     """Get income tax bracket client (HTTP adapter backed by pf-svc-reference)."""
     return IncomeTaxBracketClient(
-        base_url=settings.pf_reference_base_url,
-        cache_ttl_seconds=settings.pf_reference_cache_ttl_seconds,
+        base_url=settings.pf_svc_reference_base_url,
+        cache_ttl_seconds=settings.pf_svc_reference_cache_ttl_seconds,
     )
 
 

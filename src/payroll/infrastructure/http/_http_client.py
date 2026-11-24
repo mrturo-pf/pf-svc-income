@@ -28,7 +28,7 @@ _logger = structlog.get_logger()
 # already cached in its DB, and httpx's default client timeout (~5s, no
 # override configured here) can easily be shorter than that whole cascade
 # under concurrent load -- confirmed in practice (2026-10-02 investigation):
-# bursts of `pf_reference_network_error` in this client correlated exactly with
+# bursts of `pf_svc_reference_network_error` in this client correlated exactly with
 # `mindicador_fetch_failed`/`bcch_credentials_not_configured` on pf-svc-reference'
 # side, for dates whose USD/EUR rate wasn't pre-cached. Without a retry,
 # every one of those transient hiccups degrades to the exact same `null` a
@@ -40,7 +40,7 @@ _MAX_NETWORK_RETRY_ATTEMPTS = 3
 _RETRY_BACKOFF_SECONDS = (0.5, 1.0)  # delay before attempt 2, then before attempt 3
 
 
-class PfRatesClientBase:
+class PfSvcReferenceClientBase:
     """Shared constructor for pf-svc-reference HTTP adapters."""
 
     def __init__(
@@ -70,7 +70,7 @@ class PfRatesClientBase:
         return headers
 
 
-async def _pf_reference_request(
+async def _pf_svc_reference_request(
     url: str,
     params: dict[str, str | int | float] | None,
     headers: dict[str, str],
@@ -81,8 +81,8 @@ async def _pf_reference_request(
 ) -> httpx.Response | None:
     """Issue a GET to pf-svc-reference and return the raw response, or None on 404.
 
-    Shared by pf_reference_get() (single-object endpoints) and
-    pf_reference_get_list() (list endpoints, e.g. GET /economic-indices) --
+    Shared by pf_svc_reference_get() (single-object endpoints) and
+    pf_svc_reference_get_list() (list endpoints, e.g. GET /economic-indices) --
     both need identical error handling, they only differ in how the JSON
     body is shaped once a response actually comes back.
 
@@ -115,7 +115,7 @@ async def _pf_reference_request(
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
             _logger.error(
-                "pf_reference_http_error",
+                "pf_svc_reference_http_error",
                 label=label,
                 url=url,
                 params=params,
@@ -128,7 +128,7 @@ async def _pf_reference_request(
         except httpx.RequestError as exc:
             exhausted = attempt >= _MAX_NETWORK_RETRY_ATTEMPTS
             _logger.warning(
-                "pf_reference_network_error",
+                "pf_svc_reference_network_error",
                 label=label,
                 url=url,
                 params=params,
@@ -150,7 +150,7 @@ async def _pf_reference_request(
         else:
             if attempt > 1:
                 _logger.info(
-                    "pf_reference_network_retry_succeeded",
+                    "pf_svc_reference_network_retry_succeeded",
                     label=label,
                     url=url,
                     params=params,
@@ -159,7 +159,7 @@ async def _pf_reference_request(
             return response
 
 
-async def pf_reference_get(
+async def pf_svc_reference_get(
     url: str,
     params: dict[str, str | int | float] | None,
     headers: dict[str, str],
@@ -171,11 +171,11 @@ async def pf_reference_get(
     Returns:
         Parsed JSON dict on 2xx, or None on 404.
     """
-    response = await _pf_reference_request(url, params, headers, label=label)
+    response = await _pf_svc_reference_request(url, params, headers, label=label)
     return response.json() if response is not None else None
 
 
-async def pf_reference_post(
+async def pf_svc_reference_post(
     url: str,
     payload: dict[str, object],
     headers: dict[str, str],
@@ -183,7 +183,7 @@ async def pf_reference_post(
     label: str,
 ) -> dict[str, object] | None:
     """Issue a POST to pf-svc-reference and return its parsed JSON object body."""
-    response = await _pf_reference_request(
+    response = await _pf_svc_reference_request(
         url,
         None,
         headers,
@@ -194,7 +194,7 @@ async def pf_reference_post(
     return response.json() if response is not None else None
 
 
-async def pf_reference_get_list(
+async def pf_svc_reference_get_list(
     url: str,
     params: dict[str, str | int | float] | None,
     headers: dict[str, str],
@@ -208,5 +208,5 @@ async def pf_reference_get_list(
         e.g. an economic index code with no stored values) is a normal 200
         response distinct from a 404 -- callers must check for both.
     """
-    response = await _pf_reference_request(url, params, headers, label=label)
+    response = await _pf_svc_reference_request(url, params, headers, label=label)
     return response.json() if response is not None else None

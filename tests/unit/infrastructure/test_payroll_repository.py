@@ -196,7 +196,7 @@ class FakeSession(FakeResultsQueueBase):
 class FakeMarketDataRepository:
     """Test double for MarketDataRepository (the pf-svc-reference-backed port).
 
-    Mirrors PfRatesClient's get_exchange_rate_value() shape exactly --
+    Mirrors PfSvcReferenceClient's get_exchange_rate_value() shape exactly --
     predict_next_period_net_pay() no longer does any fallback logic of its
     own (pf-svc-reference owns the whole DB-hit -> provider -> nearest-prior-date
     cascade server-side now), so this fake only ever needs a flat
@@ -3483,7 +3483,9 @@ async def test_resolve_currency_equivalents_degrades_missing_currency_independen
 
 
 @pytest.mark.asyncio
-async def test_resolve_currency_equivalents_degrades_on_pf_reference_outage() -> None:
+async def test_resolve_currency_equivalents_degrades_on_pf_svc_reference_outage() -> (
+    None
+):
     """pf-svc-reference raising for every currency degrades all three to None.
 
     resolve_currency_equivalents() never propagates -- unlike

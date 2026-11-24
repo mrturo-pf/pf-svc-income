@@ -1,4 +1,4 @@
-"""Tests for PfRatesClient batch lookups."""
+"""Tests for PfSvcReferenceClient batch lookups."""
 
 from datetime import date
 from decimal import Decimal
@@ -7,15 +7,15 @@ import httpx
 import pytest
 import respx
 
-from payroll.infrastructure.http.pf_rates_client import PfRatesClient
+from payroll.infrastructure.http.pf_svc_reference_client import PfSvcReferenceClient
 
 
 BASE_URL = "http://pf-svc-reference.test"
 
 
-def _client() -> PfRatesClient:
+def _client() -> PfSvcReferenceClient:
     """Build a test client."""
-    return PfRatesClient(BASE_URL)
+    return PfSvcReferenceClient(BASE_URL)
 
 
 @pytest.mark.asyncio

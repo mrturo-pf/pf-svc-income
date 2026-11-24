@@ -7,10 +7,10 @@ from decimal import Decimal
 from typing import cast
 
 from payroll.infrastructure.http._http_client import (
-    PfRatesClientBase,
-    pf_reference_get,
-    pf_reference_get_list,
-    pf_reference_post,
+    PfSvcReferenceClientBase,
+    pf_svc_reference_get,
+    pf_svc_reference_get_list,
+    pf_svc_reference_post,
 )
 from payroll.shared.constants import MONTHLY_EXCHANGE_RATE_CODES
 
@@ -26,7 +26,7 @@ def _normalize_exchange_rate_date(currency_code: str, rate_date: date) -> date:
     return rate_date
 
 
-class PfRatesClient(PfRatesClientBase):
+class PfSvcReferenceClient(PfSvcReferenceClientBase):
     """HTTP adapter implementing MarketDataRepository via pf-svc-reference REST API."""
 
     async def get_exchange_rate_value(
@@ -39,7 +39,7 @@ class PfRatesClient(PfRatesClientBase):
         if hit:
             return cached  # type: ignore[return-value]
 
-        result = await pf_reference_get(
+        result = await pf_svc_reference_get(
             f"{self._base_url}/exchange-rates/value",
             {"currency_code": currency_code, "rate_date": normalized_date.isoformat()},
             await self._request_headers(),
@@ -69,7 +69,7 @@ class PfRatesClient(PfRatesClientBase):
                 missing.append(pair)
                 seen_missing.add(pair)
         if missing:
-            result = await pf_reference_post(
+            result = await pf_svc_reference_post(
                 f"{self._base_url}/exchange-rates/values",
                 {
                     "pairs": [
@@ -114,7 +114,7 @@ class PfRatesClient(PfRatesClientBase):
                 missing.append(pair)
                 seen_missing.add(pair)
         if missing:
-            result = await pf_reference_post(
+            result = await pf_svc_reference_post(
                 f"{self._base_url}/economic-indices/values",
                 {
                     "pairs": [
@@ -149,7 +149,7 @@ class PfRatesClient(PfRatesClientBase):
         if hit:
             return cached  # type: ignore[return-value]
 
-        result = await pf_reference_get(
+        result = await pf_svc_reference_get(
             f"{self._base_url}/economic-indices/value",
             {"code": code, "year": period_year, "month": period_month},
             await self._request_headers(),
@@ -172,7 +172,7 @@ class PfRatesClient(PfRatesClientBase):
         if hit:
             return cached  # type: ignore[return-value]
 
-        results = await pf_reference_get_list(
+        results = await pf_svc_reference_get_list(
             f"{self._base_url}/economic-indices",
             {"code": code},
             await self._request_headers(),
