@@ -62,7 +62,8 @@ class PfSvcReferenceClientBase:
     async def _request_headers(self) -> dict[str, str]:
         """Build per-call headers with one ID and backend identity token."""
         headers = {request_id_header_name(): get_or_create_request_id()}
-        if ".gateway.dev" not in self._base_url:
+        is_local = self._base_url.startswith(("http://localhost:", "http://127.0.0.1:"))
+        if not is_local and ".gateway.dev" not in self._base_url:
             identity_token = await asyncio.to_thread(
                 id_token.fetch_id_token, GoogleAuthRequest(), self._base_url
             )
