@@ -132,8 +132,6 @@ jobs:
       dependency_service_name: ''
       dependency_url: https://pf-svc-reference-yqd4p7fzaa-uc.a.run.app
       dependency_env_name: PF_SVC_REFERENCE_URL
-      protected_smoke_path: /payroll/employers
-      protected_smoke_secret_name: PF_SVC_INCOME_API_KEY
       smoke_url: https://pf-backend-gateway-poc-88uq0qjn.uc.gateway.dev/income/health
       smoke_requires_auth: false
     secrets: inherit
