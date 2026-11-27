@@ -75,7 +75,7 @@ Keep unit tests isolated with typed hand-written stubs and use integration tests
 ## Gateway entry-point contract
 
 Production traffic must reach `pf-svc-income` through the GCP API Gateway facade and
-`pf-gateway-proxy`. Direct Cloud Run invocation is reserved for the gateway/proxy,
+`pf-svc-gateway-proxy`. Direct Cloud Run invocation is reserved for the gateway/proxy,
 controlled rollback, or explicitly authorized operator diagnostics. The current direct
 income-to-reference client path is transitional; new integration code must use the
 Gateway facade and the migration must remove the direct path before final enforcement.
