@@ -22,7 +22,7 @@ curl -X POST http://127.0.0.1:8000/payroll/import/spreadsheet \
 
 Instead of a CSV/XLSX file, one or more payslip PDFs can be turned into payroll
 periods through a two-step preview/confirm flow. Extraction is template-based
-(versioned templates stored in pf-db's `INC_PDF_TEMPLATE`/`INC_PDF_TEMPLATE_FIELD`
+(versioned templates stored in pf-db's `INC_PAY_PDF_TEMPLATE`/`INC_PAY_PDF_TEMPLATE_FIELD`
 tables, managed via `POST`/`GET`/`PUT`/`DELETE /payroll/templates*`), never OCR/LLM --
 a PDF matching no known template, or containing rows a template doesn't recognize,
 still contributes a usable preview with those rows flagged as unresolved

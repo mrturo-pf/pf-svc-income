@@ -55,7 +55,7 @@ make local-up-test   # same + test fixtures (plans, insurance providers)
 
 This starts a PostgreSQL 16 container on `localhost:5432` with:
 - All tables created
-- Base seed data loaded (RAT_CURRENCY, institutions, caps, brackets, concepts)
+- Base seed data loaded (REF_RATE_UNIT, institutions, caps, brackets, concepts)
 - Test fixtures loaded (if using `make local-up-test`)
 
 ### Step 2: Start pf-svc-income
@@ -83,10 +83,10 @@ pf-svc-income **owns** the following tables (writes allowed):
 |---|---|
 | `INC_EMPLOYER` | Employer entities |
 | `INC_PAYROLL` | Payroll periods (month/year + payment date) |
-| `INC_PRD_HLTH` | Health plan selections per period |
-| `INC_PRD_COMP` | Complementary insurance per period |
-| `INC_CONCEPT` | Custom payroll concepts (bonuses, deductions) |
-| `INC_ITEM` | Individual payroll line items |
+| `INC_PAY_PRD_HLTH` | Health plan selections per period |
+| `INC_PAY_PRD_COMP` | Complementary insurance per period |
+| `INC_PAY_CONCEPT` | Custom payroll concepts (bonuses, deductions) |
+| `INC_PAY_ITEM` | Individual payroll line items |
 
 ### Reference data tables
 
@@ -112,10 +112,10 @@ pf-svc-income **reads** these tables owned by [pf-svc-reference](https://github.
 
 | Table | Owner | Access method |
 |---|---|---|
-| `RAT_CURRENCY` | pf-svc-reference | **HTTP API only** (never direct SQL) |
-| `RAT_EXCH_RATE` | pf-svc-reference | **HTTP API only** |
-| `RAT_ECON_INDEX` | pf-svc-reference | **HTTP API only** |
-| `RAT_TAX_BRCKT` | pf-svc-reference | **HTTP API only** |
+| `REF_RATE_UNIT` | pf-svc-reference | **HTTP API only** (never direct SQL) |
+| `REF_RATE_VALUE` | pf-svc-reference | **HTTP API only** |
+| `REF_ECON_INDEX` | pf-svc-reference | **HTTP API only** |
+| `REF_TAX_BRCKT` | pf-svc-reference | **HTTP API only** |
 
 **Important:** pf-svc-income accesses financial rates via the **pf-svc-reference HTTP API** — it never queries these tables directly via SQL.
 
@@ -125,7 +125,7 @@ SQLAlchemy models live in `infrastructure/db/models/`:
 
 | File | Tables |
 |---|---|
-| `payroll.py` | `INC_EMPLOYER`, `INC_PAYROLL`, `INC_PRD_HLTH`, `INC_PRD_COMP`, `INC_CONCEPT`, `INC_ITEM`, `INC_MV_PAY_SUMMARY` |
+| `payroll.py` | `INC_EMPLOYER`, `INC_PAYROLL`, `INC_PAY_PRD_HLTH`, `INC_PAY_PRD_COMP`, `INC_PAY_CONCEPT`, `INC_PAY_ITEM`, `INC_MV_PAY_SUMMARY` |
 | `reference_data.py` | `INC_PENS_INST`, `INC_HLTH_INST`, `INC_PENS_PLAN`, `INC_HLTH_PLAN`, `INC_CNTRB_CAP`, `INC_COMP_PROV`, `INC_COMP_PLAN` |
 
 ### Example: Employer model
@@ -229,7 +229,7 @@ Common queries:
 SELECT COUNT(*) FROM "INC_PAYROLL";
 
 -- Show recent payroll items
-SELECT * FROM "INC_ITEM" ORDER BY id DESC LIMIT 10;
+SELECT * FROM "INC_PAY_ITEM" ORDER BY id DESC LIMIT 10;
 ```
 
 ### Using Adminer
