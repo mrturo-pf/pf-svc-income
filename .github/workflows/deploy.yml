@@ -121,7 +121,7 @@ permissions:
 jobs:
   deploy:
     name: Validation
-    uses: mrturo-pf/pf-svc-common/.github/workflows/deploy-reusable.yml@main
+    uses: mrturo-pf/pf-svc-common/.github/workflows/deploy-reusable.yml@7f5c5c54cd6c8a902461c62bfe08250daa07a980
     with:
       repo_name: pf-svc-income
       # Injects the PF_DATABASE_URL secret into the app as PF_DATABASE_URL.

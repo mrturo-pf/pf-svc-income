@@ -34,7 +34,7 @@ on:
 
 jobs:
   setup:
-    uses: mrturo-pf/pf-svc-common/.github/workflows/gcp-setup-reusable.yml@main
+    uses: mrturo-pf/pf-svc-common/.github/workflows/gcp-setup-reusable.yml@7f5c5c54cd6c8a902461c62bfe08250daa07a980
     with:
       service_name: pf-svc-income
       create_secrets: ${{ inputs.create_secrets }}
