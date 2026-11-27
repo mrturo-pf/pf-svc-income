@@ -55,7 +55,7 @@ Highly normalized design. Supports economic indices, health and pension institut
 -- ============================================================
 -- 1. Units and Currencies
 -- ============================================================
-CREATE TABLE IF NOT EXISTS "RAT_CURRENCY" (
+CREATE TABLE IF NOT EXISTS "REF_RATE_UNIT" (
     code        CHAR(3) PRIMARY KEY,
     name        VARCHAR(60) NOT NULL,
     is_fiat     BOOLEAN     NOT NULL DEFAULT TRUE,
@@ -63,9 +63,9 @@ CREATE TABLE IF NOT EXISTS "RAT_CURRENCY" (
         CHECK (unit_kind IN ('currency', 'index_unit'))
 );
 
-CREATE TABLE IF NOT EXISTS "RAT_EXCH_RATE" (
+CREATE TABLE IF NOT EXISTS "REF_RATE_VALUE" (
     id            BIGSERIAL PRIMARY KEY,
-    currency_code CHAR(3)         NOT NULL REFERENCES "RAT_CURRENCY"(code),
+    currency_code CHAR(3)         NOT NULL REFERENCES "REF_RATE_UNIT"(code),
     rate_date     DATE            NOT NULL,
     value_clp     NUMERIC(18,6)   NOT NULL CHECK (value_clp > 0),
     source        VARCHAR(40)     NOT NULL DEFAULT 'manual',
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS "RAT_EXCH_RATE" (
     UNIQUE (currency_code, rate_date)
 );
 
-CREATE TABLE IF NOT EXISTS "RAT_ECON_INDEX" (
+CREATE TABLE IF NOT EXISTS "REF_ECON_INDEX" (
     id             BIGSERIAL PRIMARY KEY,
     code           VARCHAR(20)     NOT NULL, -- e.g., IPC_CL
     period_year    SMALLINT        NOT NULL CHECK (period_year BETWEEN 1990 AND 2100),
@@ -193,8 +193,8 @@ SELECT
     SUM(CASE WHEN c.kind = 'income'   THEN i.amount_clp ELSE 0 END)
   - SUM(CASE WHEN c.kind = 'discount' THEN i.amount_clp ELSE 0 END) AS net_pay_clp
 FROM "INC_PAYROLL" p
-JOIN "INC_ITEM"   i ON i.period_id = p.id
-JOIN "INC_CONCEPT" c ON c.id = i.concept_id
+JOIN "INC_PAY_ITEM"   i ON i.period_id = p.id
+JOIN "INC_PAY_CONCEPT" c ON c.id = i.concept_id
 GROUP BY p.id;
 ```
 
@@ -325,7 +325,7 @@ def to_long_format(wide_df: pd.DataFrame) -> pd.DataFrame:
 ### 5.1 Alternative ingestion: payslip PDF
 
 An alternative to Excel/CSV: extraction based on versioned templates stored in pf-db's
-`INC_PDF_TEMPLATE`/`INC_PDF_TEMPLATE_FIELD` tables (managed via `POST`/`GET`/`PUT`/
+`INC_PAY_PDF_TEMPLATE`/`INC_PAY_PDF_TEMPLATE_FIELD` tables (managed via `POST`/`GET`/`PUT`/
 `DELETE /payroll/templates*`, not a git-tracked file), never OCR/LLM. `POST
 /payroll/pdf-preview` accepts a batch of one or more payslip PDFs and returns one
 preview per file, in upload order; `POST /payroll/import/json` then confirms one or
