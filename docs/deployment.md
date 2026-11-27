@@ -16,18 +16,18 @@ The service is deployed to **Google Cloud Run** via **GitHub Actions** (`.github
 ## Pipeline jobs
 
 `.github/workflows/deploy.yml` is a thin caller — it does **not** define jobs itself.
-It delegates the entire pipeline to a shared reusable workflow in `pf-common`:
+It delegates the entire pipeline to a shared reusable workflow in `pf-svc-common`:
 
 ```yaml
 jobs:
   deploy:
-    uses: mrturo-pf/pf-common/.github/workflows/deploy-reusable.yml@main
+    uses: mrturo-pf/pf-svc-common/.github/workflows/deploy-reusable.yml@main
     with:
       repo_name: pf-svc-income
     secrets: inherit
 ```
 
-The real pipeline lives in `pf-common/.github/workflows/deploy-reusable.yml` and runs
+The real pipeline lives in `pf-svc-common/.github/workflows/deploy-reusable.yml` and runs
 six jobs. The merge to the protected `main` branch is the release approval; no
 additional production approval gate is used.
 

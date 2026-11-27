@@ -2,8 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=../../pf-common/scripts/write_env_common.sh
-source "$SCRIPT_DIR/../../pf-common/scripts/write_env_common.sh"
+# shellcheck source=../../pf-svc-common/scripts/write_env_common.sh
+source "$SCRIPT_DIR/../../pf-svc-common/scripts/write_env_common.sh"
 
 ENV_FILE="${ENV_FILE:-.env}"
 PAYROLL_ENV="${PAYROLL_ENV:-development}"
